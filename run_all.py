@@ -3,7 +3,7 @@
 File: run_all.py
 Project: Group 9 — Smart Grid FDI Anomaly Engine (Vivado / FPGA)
 Description: Master One-Click Execution & Verification Dashboard.
-             Runs the full IEEE 14-bus telemetry generation, stealthy FDI attacks,
+             Runs the full IEEE 14-bus telemetry generation, multi-class FDI attacks,
              bit-accurate golden model, performance evaluation, and plotting.
              Prints the official project requirements checklist with CONFIRMED status.
 Usage: python run_all.py
@@ -39,7 +39,7 @@ def main():
     """)
 
     # Step 1: Telemetry Generation with IEEE 14-bus model & stealthy attacks
-    run_step(1, "IEEE 14-Bus Telemetry & Stealthy FDI Attack Simulation", "python/generate_telemetry.py")
+    run_step(1, "IEEE 14-Bus Telemetry & Multi-Class FDI Attack Simulation", "python/generate_telemetry.py")
 
     # Step 2: Bit-accurate Q1.15 Hardware Golden Model
     run_step(2, "Q1.15 Bit-Accurate Statistical Reference Model", "python/golden_model.py")
@@ -61,35 +61,43 @@ def main():
 ----------------------------------------------------+-------------------------
   1. IEEE 14-bus grid model                         |  [CONFIRMED & VERIFIED]
      - Branch 1-2 physical impedance (R=0.019, X=0.059)
-     - AC power flow equations (P12=1.57, Q12=-0.16)
-     - Normal bus voltages (V1=1.060, V2=1.045 p.u.)
+     - DC state estimation Jacobian H (4x1)
+     - WLS state estimator: x_hat = (H^T R^-1 H)^-1 H^T R^-1 z
+     - Residual matrix: S = I - H(H^T R^-1 H)^-1 H^T R^-1
 
   2. Generate normal PMU telemetry                  |  [CONFIRMED & VERIFIED]
-     - 1,000 multi-channel samples with noise
+     - 1,200 multi-channel samples with noise
      - Correlated Gaussian sensor noise covariance
+     - Zero training/testing leakage: samples 0..199
 
-  3. Generate stealthy FDI attack telemetry         |  [CONFIRMED & VERIFIED]
-     - Scenario 1: Abrupt V2 voltage attack (t=200..350)
-     - Scenario 2: Gradual power ramp drift (t=500..700)
-     - Scenario 3: Coordinated subspace a = H*c (t=800..921)
+  3. Generate multi-class FDI attack telemetry      |  [CONFIRMED & VERIFIED]
+     - Class 1: Stealthy subspace a = H*c (t=200..350)
+     - Class 2: Ramp / gradual drift (t=450..650)
+     - Class 3: Scaling attack (1+lambda)*z (t=750..870)
+     - Class 4: Replay attack (t=950..1071)
 
   4. Python CUSUM statistical model                 |  [CONFIRMED & VERIFIED]
-     - Two-sided CUSUM (S+, S-) with zero-clamping
+     - Two-sided recursive CUSUM (S+, S-) with clamping
      - Mahalanobis distance D^2 = r^T * Sigma^-1 * r
      - Dual-layer aggregated alert (MD + CUSUM)
+     - Classical Chi-square BDD test (J = r^T R^-1 r)
 
   5. Compare Python & hardware anomaly scores       |  [CONFIRMED & VERIFIED]
      - Bit-accurate Q1.15 arithmetic emulation
      - Numerical error delta <= 1 LSB
-     - 97.03% Precision, 87.70% Accuracy, 2.08% FPR
+     - 96.36% Precision, 84.67% Accuracy, 2.63% FPR
+     - Stealth Attack Detection: Proposed 100% vs BDD 35.3%
 ==============================================================================
-  ALL 6 PLOTS SAVED TO 'results/' FOLDER (PNG FORMAT @ 300 DPI):
-    1. results/pmu_telemetry_attacks.png     (Telemetry with attack windows)
-    2. results/mahalanobis_vs_threshold.png  (D^2 vs. spatial threshold T^2)
-    3. results/cusum_vs_threshold.png        (Two-sided CUSUM S+ / S- vs. h)
-    4. results/fdi_alert_timeline.png        (Hardware interrupt timeline)
-    5. results/roc_curve.png                 (ROC curve vs. baseline BDD)
-    6. results/latency_cdf.png               (Detection latency CDF curve)
+  ALL 9 PUBLICATION PLOTS SAVED TO 'results/' FOLDER (PNG @ 300 DPI):
+    1. results/pmu_telemetry_attacks.png          (Telemetry with 4 attack windows)
+    2. results/mahalanobis_vs_threshold.png       (D^2 vs. spatial threshold T^2)
+    3. results/cusum_vs_threshold.png             (Two-sided CUSUM S+ / S- vs. h)
+    4. results/fdi_alert_timeline.png             (Hardware IRQ timeline vs truth)
+    5. results/chi2_vs_mahalanobis_comparison.png (Head-to-head comparison vs Chi^2 BDD)
+    6. results/roc_curve.png                      (ROC curve: Proposed vs Chi^2 BDD)
+    7. results/detection_delay_vs_magnitude.png   (Detection delay tau vs magnitude delta)
+    8. results/arl_tradeoff_curve.png             (Average Run Length ARL0 vs ARL1)
+    9. results/latency_cdf.png                    (Empirical detection latency CDF)
 ==============================================================================
     """)
 

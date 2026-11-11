@@ -79,8 +79,10 @@ module tb_pmu_anomaly_top;
     int in_file, out_file;
     string line;
     int sample_idx, ch0_val, ch1_val, ch2_val, ch3_val, attack_label;
+    int exp_d2, exp_st, exp_alarm;
     real v1, v2, p12, q12;
     string dummy_hex0, dummy_hex1, dummy_hex2, dummy_hex3, attack_type;
+    int is_syllabus_format = 0;
 
     int samples_processed = 0;
     int alerts_detected   = 0;
@@ -117,11 +119,19 @@ module tb_pmu_anomaly_top;
         rst_n = 1;
         #20;
 
-        // Open input CSV file
-        in_file = $fopen("data/pmu_telemetry.csv", "r");
-        if (in_file == 0) begin
-            $display("[WARN] Could not open 'data/pmu_telemetry.csv'. Trying relative '../data/pmu_telemetry.csv'...");
-            in_file = $fopen("../data/pmu_telemetry.csv", "r");
+        // Open input CSV file (try syllabus time-series export first, then raw telemetry)
+        in_file = $fopen("data/fdi_anomaly_timeseries.csv", "r");
+        if (in_file != 0) begin
+            is_syllabus_format = 1;
+        end else begin
+            in_file = $fopen("../data/fdi_anomaly_timeseries.csv", "r");
+            if (in_file != 0) begin
+                is_syllabus_format = 1;
+            end else begin
+                in_file = $fopen("data/pmu_telemetry.csv", "r");
+                if (in_file == 0) in_file = $fopen("../data/pmu_telemetry.csv", "r");
+                is_syllabus_format = 0;
+            end
         end
 
         // Open output log file
@@ -143,13 +153,20 @@ module tb_pmu_anomaly_top;
                 int n_fields;
                 void'($fgets(line, in_file));
                 if (line.len() > 5) begin
-                    n_fields = $sscanf(line, "%d,%f,%f,%f,%f,%d,%d,%d,%d,%s,%s,%s,%s,%d,%s",
-                                       sample_idx, v1, v2, p12, q12,
-                                       ch0_val, ch1_val, ch2_val, ch3_val,
-                                       dummy_hex0, dummy_hex1, dummy_hex2, dummy_hex3,
-                                       attack_label, attack_type);
+                    if (is_syllabus_format) begin
+                        n_fields = $sscanf(line, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%s",
+                                           sample_idx, ch0_val, ch1_val, ch2_val, ch3_val,
+                                           exp_d2, exp_st, exp_alarm,
+                                           attack_label, attack_type);
+                    end else begin
+                        n_fields = $sscanf(line, "%d,%f,%f,%f,%f,%d,%d,%d,%d,%s,%s,%s,%s,%d,%s",
+                                           sample_idx, v1, v2, p12, q12,
+                                           ch0_val, ch1_val, ch2_val, ch3_val,
+                                           dummy_hex0, dummy_hex1, dummy_hex2, dummy_hex3,
+                                           attack_label, attack_type);
+                    end
 
-                    if (n_fields >= 14) begin
+                    if ((is_syllabus_format && n_fields >= 9) || (!is_syllabus_format && n_fields >= 14)) begin
                         // Wait until DUT is ready to accept a new vector
                         while (!data_ready) @(posedge clk);
 

@@ -5,10 +5,10 @@ Project: Group 9 — Smart Grid FDI Anomaly Engine (Vivado / FPGA)
 Description: Bit-accurate Python Golden Reference Model of the SystemVerilog RTL.
              Faithfully implements:
              - Signed Q1.15 arithmetic with rounding and saturation.
-             - Matrix-vector multiplication and quadratic Mahalanobis distance.
-             - Two-sided recursive CUSUM filters with BRAM state emulation.
+             - Matrix-vector multiplication and quadratic Mahalanobis distance D^2.
+             - Two-sided recursive CUSUM filters (S+, S-) with BRAM state emulation.
              - Spatial, temporal, and aggregated FDI alerts.
-             Ingests data/pmu_telemetry.csv and exports data/golden_results.csv.
+             - Conforms to syllabus schema: exports t, y, D2, S_t, alarm, label.
 """
 
 import os
@@ -74,18 +74,17 @@ def main():
     # BRAM State Memory Emulation (4 channels)
     bram_s_pos = np.zeros(n_channels, dtype=int)
     bram_s_neg = np.zeros(n_channels, dtype=int)
-    bram_alert_count = np.zeros(n_channels, dtype=int)
 
     results = []
 
     for t in range(n_samples):
         # Extract 4-channel measurement vector in Q1.15
-        r_vec = np.array([
-            df_in.loc[t, "ch0_q15"],
-            df_in.loc[t, "ch1_q15"],
-            df_in.loc[t, "ch2_q15"],
-            df_in.loc[t, "ch3_q15"]
-        ], dtype=int)
+        ch0 = df_in.loc[t, "y0"] if "y0" in df_in else df_in.loc[t, "ch0_q15"]
+        ch1 = df_in.loc[t, "y1"] if "y1" in df_in else df_in.loc[t, "ch1_q15"]
+        ch2 = df_in.loc[t, "y2"] if "y2" in df_in else df_in.loc[t, "ch2_q15"]
+        ch3 = df_in.loc[t, "y3"] if "y3" in df_in else df_in.loc[t, "ch3_q15"]
+
+        r_vec = np.array([ch0, ch1, ch2, ch3], dtype=int)
 
         # ---------------------------------------------------------------------
         # 1. Mahalanobis Engine: y = W * r, D^2 = r^T * y
@@ -117,6 +116,7 @@ def main():
         # 2. Time-Multiplexed CUSUM Filter across Channels
         # ---------------------------------------------------------------------
         channel_alerts = []
+        max_cusum_val = 0
         for ch in range(n_channels):
             e_in = r_vec[ch]
             s_pos = bram_s_pos[ch]
@@ -136,6 +136,11 @@ def main():
             bram_s_pos[ch] = next_pos_clamped
             bram_s_neg[ch] = next_neg_clamped
 
+            if next_pos_clamped > max_cusum_val:
+                max_cusum_val = next_pos_clamped
+            if next_neg_clamped > max_cusum_val:
+                max_cusum_val = next_neg_clamped
+
             alert_pos = int(next_pos_clamped > cusum_h)
             alert_neg = int(next_neg_clamped > cusum_h)
             ch_cusum_alert = alert_pos or alert_neg
@@ -144,12 +149,27 @@ def main():
         temporal_alert = int(any(channel_alerts))
         fdi_alert = int(spatial_alert or temporal_alert)
 
+        time_val = int(df_in.loc[t, "t"]) if "t" in df_in else int(df_in.loc[t, "sample_idx"])
+        ground_truth = int(df_in.loc[t, "attack_label"])
+        attack_type = df_in.loc[t, "attack_type"]
+
         results.append({
             "sample_idx": t,
+            "t": time_val,
+            "y0": ch0,
+            "y1": ch1,
+            "y2": ch2,
+            "y3": ch3,
             "dm2_metric": dm2_val,
+            "D2": dm2_val,
+            "S_t": max_cusum_val,
             "spatial_alert": spatial_alert,
             "temporal_alert": temporal_alert,
             "fdi_alert": fdi_alert,
+            "alarm": fdi_alert,
+            "label": ground_truth,
+            "ground_truth": ground_truth,
+            "attack_type": attack_type,
             "s_pos_ch0": bram_s_pos[0],
             "s_neg_ch0": bram_s_neg[0],
             "s_pos_ch1": bram_s_pos[1],
@@ -157,21 +177,24 @@ def main():
             "s_pos_ch2": bram_s_pos[2],
             "s_neg_ch2": bram_s_neg[2],
             "s_pos_ch3": bram_s_pos[3],
-            "s_neg_ch3": bram_s_neg[3],
-            "ground_truth": df_in.loc[t, "attack_label"],
-            "attack_type": df_in.loc[t, "attack_type"]
+            "s_neg_ch3": bram_s_neg[3]
         })
 
     df_out = pd.DataFrame(results)
     out_path = "data/golden_results.csv"
     df_out.to_csv(out_path, index=False)
 
+    # Export syllabus-exact CSV: t, y0, y1, y2, y3, D2, S_t, alarm, label
+    syllabus_cols = ["t", "y0", "y1", "y2", "y3", "D2", "S_t", "alarm", "label", "attack_type"]
+    syllabus_path = "data/fdi_anomaly_timeseries.csv"
+    df_out[syllabus_cols].to_csv(syllabus_path, index=False)
+
     total_alerts = df_out["fdi_alert"].sum()
     total_attacks = df_out["ground_truth"].sum()
     print(f"[+] Golden model evaluation complete. Output saved to {out_path}")
+    print(f"[+] Canonical syllabus dataset exported to {syllabus_path} (columns: {syllabus_cols})")
     print(f"[+] Total attack frames in dataset: {total_attacks}")
     print(f"[+] Total FDI alerts triggered: {total_alerts}")
 
 if __name__ == "__main__":
     main()
-
