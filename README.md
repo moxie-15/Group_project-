@@ -178,3 +178,4 @@ vivado -mode batch -source scripts/run_implementation.tcl
 - [x] Bit-accurate Python reference model.
 - [x] Full evaluation metrics and publication figures (ROC curve, latency CDF, waveforms).
 - [x] Automated Vivado Tcl scripts and handoff guide.
+

@@ -78,3 +78,4 @@ module fixed_point_accumulator
     assign overflow_out = overflow_reg;
 
 endmodule
+

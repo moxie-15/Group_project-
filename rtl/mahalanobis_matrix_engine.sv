@@ -157,3 +157,4 @@ module mahalanobis_matrix_engine
     assign done_o        = done_reg;
 
 endmodule
+

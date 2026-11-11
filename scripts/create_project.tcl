@@ -78,3 +78,4 @@ puts "==========================================================================
 puts "  PROJECT CREATED SUCCESSFULLY!"
 puts "  To open project in GUI: vivado $PROJ_DIR/$PROJ_NAME.xpr"
 puts "=========================================================================="
+

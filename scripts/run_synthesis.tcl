@@ -56,3 +56,4 @@ puts "  Reports generated in: $REPORT_DIR"
 puts "    - Utilization: $REPORT_DIR/utilization_synth.rpt"
 puts "    - Timing:      $REPORT_DIR/timing_synth.rpt"
 puts "=========================================================================="
+

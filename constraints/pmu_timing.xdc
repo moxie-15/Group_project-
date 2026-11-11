@@ -33,3 +33,4 @@ set_output_delay -clock [get_clocks clk] -min 0.500 [get_ports frame_done_o]
 # Asynchronous Reset False Path
 # ------------------------------------------------------------------------------
 set_false_path -from [get_ports rst_n]
+

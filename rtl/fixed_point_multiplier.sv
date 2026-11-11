@@ -60,3 +60,4 @@ module fixed_point_multiplier
     assign overflow_out = overflow_q;
 
 endmodule
+

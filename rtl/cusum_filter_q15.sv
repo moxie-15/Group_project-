@@ -105,3 +105,4 @@ module cusum_filter_q15
     assign alert_cusum_o   = alert_pos_reg || alert_neg_reg;
 
 endmodule
+

@@ -52,3 +52,4 @@ module pmu_state_bram
     assign dout = pmu_channel_state_t'(dout_reg);
 
 endmodule
+

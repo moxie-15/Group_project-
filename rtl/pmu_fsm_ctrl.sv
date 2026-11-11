@@ -168,3 +168,4 @@ module pmu_fsm_ctrl
     assign current_state_o = current_state;
 
 endmodule
+

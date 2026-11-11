@@ -132,3 +132,4 @@ Before final report submission:
 - [ ] Run `scripts/run_synthesis.tcl` and `scripts/run_implementation.tcl`.
 - [ ] Copy exact numbers from `vivado/reports/` into the presentation slide deck / report.
 - [ ] Attach waveform screenshot from Vivado Behavioral Simulation showing `fdi_alert_o` triggering on sample 200.
+
