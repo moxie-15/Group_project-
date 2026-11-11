@@ -168,3 +168,4 @@ When preparing your submission and report screenshots, follow this exact checkli
 ### Screenshot 6: ROC Curve Comparison vs. Static Baseline
 - **File:** Open `results/roc_curve.png`.
 - **Caption:** *"Figure 5: Receiver Operating Characteristic (ROC) curve showing significant AUC improvement of the proposed Dual-Layer FPGA engine over conventional static residual testing."*
+

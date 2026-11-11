@@ -98,3 +98,4 @@ The CSV testbench [`testbench/tb_pmu_anomaly_top.sv`](file:///c:/Users/MOXIE/Des
 - To scale to an IEEE 14-bus system (14 bus voltages + 20 branch flows = 34 measurements), we simply set `N = 34` and adjust the BRAM address width `CHANNEL_BITS = 6` ($2^6 = 64$ entries).
 - The Three-Process Moore FSM controller automatically iterates through all $N$ channels before asserting `frame_done_o`.
 - Because modern mid-range FPGAs (like the AMD/Xilinx Artix-7 or Zynq-7000) have up to 220 DSP48 slices and several megabits of Block RAM, scaling to IEEE 30-bus requires less than 20% of chip capacity while maintaining full wire-speed operation."*
+
