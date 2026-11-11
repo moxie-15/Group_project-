@@ -10,13 +10,8 @@
 # ------------------------------------------------------------------------------
 # 1. Configurable FPGA Target Part
 # ------------------------------------------------------------------------------
-# Group Members: Change this variable if your lab board uses a different FPGA!
-# Common Boards:
-#   - Digilent Basys 3 (Artix-7):   xc7a35tcpg236-1   (Default)
-#   - Digilent Nexys A7 (Artix-7):  xc7a100tcsg324-1
-#   - Digilent PYNQ-Z1 (Zynq-7000): xc7z020clg400-1
-#   - Digilent Zybo Z7 (Zynq-7000): xc7z010clg400-1
-set TARGET_PART "xc7a35tcpg236-1"
+# Target: Xilinx AC701 Evaluation Kit (Artix-7 XC7A200T)
+set TARGET_PART "xc7a200tfbg676-2"
 
 set PROJ_NAME "fdi_anomaly_engine"
 set PROJ_DIR  "vivado/project"
@@ -53,14 +48,15 @@ set_property file_type SystemVerilog [get_files -of_objects [get_filesets source
 set_property top pmu_anomaly_top [get_filesets sources_1]
 
 # ------------------------------------------------------------------------------
-# 3. Add Constraints
+# 3. Add Constraints (AC701 Timing Specifications)
 # ------------------------------------------------------------------------------
-add_files -fileset constrs_1 -norecurse "constraints/pmu_timing.xdc"
+add_files -fileset constrs_1 -norecurse "constraints/ac701_timing.xdc"
 
 # ------------------------------------------------------------------------------
 # 4. Add Testbench Simulation Files
 # ------------------------------------------------------------------------------
 add_files -fileset sim_1 [list \
+    "testbench/tb_pmu_anomaly_top_standalone.sv" \
     "testbench/tb_pmu_anomaly_top.sv" \
     "testbench/tb_cusum_filter.sv" \
     "testbench/tb_mahalanobis_matrix.sv" \
