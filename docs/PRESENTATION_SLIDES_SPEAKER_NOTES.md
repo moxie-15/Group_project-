@@ -129,3 +129,4 @@
   - ✅ Publicly hosted, documented, and reproducible on GitHub: `https://github.com/moxie-15/Group_project-`
 - **Speaker Notes:**  
   *"In conclusion, Group 9 has completed all design, RTL implementation, mathematical verification, and automation deliverables for this academic project. Thank you, and we now welcome any questions."*
+

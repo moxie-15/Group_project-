@@ -706,3 +706,4 @@ module pmu_anomaly_top #(
     assign channel_active_o  = chan_ptr_q;
 
 endmodule
+
