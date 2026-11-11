@@ -14,28 +14,28 @@ package fdi_pkg;
     // ------------------------------------------------------------------------
     // System Dimensions
     // ------------------------------------------------------------------------
-    parameter int N_CHANNELS      = 4;   // 4-dimensional PMU measurement vector
-    parameter int MAX_CHANNELS    = 8;   // Scalable up to 8 channels in BRAM
-    parameter int CHANNEL_BITS    = 3;   // clog2(MAX_CHANNELS)
+    localparam int N_CHANNELS      = 4;   // 4-dimensional PMU measurement vector
+    localparam int MAX_CHANNELS    = 8;   // Scalable up to 8 channels in BRAM
+    localparam int CHANNEL_BITS    = 3;   // clog2(MAX_CHANNELS)
 
     // ------------------------------------------------------------------------
     // Q1.15 Fixed-Point Datapath Definitions
     // 1 Sign bit, 15 Fractional bits
     // Range: [-1.0, +0.999969482421875], LSB = 2^-15 = 3.0517578125e-5
     // ------------------------------------------------------------------------
-    parameter int Q15_WIDTH       = 16;
-    parameter int Q15_FRAC        = 15;
-    parameter int Q15_ONE         = 16'sh7FFF; // +0.999969 (~1.0)
-    parameter int Q15_ZERO        = 16'sh0000; // 0.0
-    parameter int Q15_MINUS_ONE   = 16'sh8000; // -1.0
+    localparam int Q15_WIDTH       = 16;
+    localparam int Q15_FRAC        = 15;
+    localparam int Q15_ONE         = 16'sh7FFF; // +0.999969 (~1.0)
+    localparam int Q15_ZERO        = 16'sh0000; // 0.0
+    localparam int Q15_MINUS_ONE   = 16'sh8000; // -1.0
 
     // Full-precision intermediate multiplication (Q1.15 x Q1.15 = Q2.30)
-    parameter int PROD_WIDTH      = 32;
-    parameter int PROD_FRAC       = 30;
+    localparam int PROD_WIDTH      = 32;
+    localparam int PROD_FRAC       = 30;
 
     // Multi-cycle / Matrix Accumulator (Guard bits for N=4 sum: +2 bits -> 34-bit)
-    parameter int ACCUM_GUARD     = 2;
-    parameter int ACCUM_WIDTH     = PROD_WIDTH + ACCUM_GUARD; // 34-bit
+    localparam int ACCUM_GUARD     = 2;
+    localparam int ACCUM_WIDTH     = PROD_WIDTH + ACCUM_GUARD; // 34-bit
 
     // ------------------------------------------------------------------------
     // Typedefs for Strongly-Typed Datapath

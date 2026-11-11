@@ -16,20 +16,20 @@
 // ============================================================================
 package fdi_pkg;
 
-    parameter int N_CHANNELS      = 4;   // 4-dimensional PMU measurement vector
-    parameter int MAX_CHANNELS    = 8;   // Scalable up to 8 channels in BRAM
-    parameter int CHANNEL_BITS    = 3;   // clog2(MAX_CHANNELS)
+    localparam int N_CHANNELS      = 4;   // 4-dimensional PMU measurement vector
+    localparam int MAX_CHANNELS    = 8;   // Scalable up to 8 channels in BRAM
+    localparam int CHANNEL_BITS    = 3;   // clog2(MAX_CHANNELS)
 
-    parameter int Q15_WIDTH       = 16;
-    parameter int Q15_FRAC        = 15;
-    parameter int Q15_ONE         = 16'sh7FFF; // +0.999969 (~1.0)
-    parameter int Q15_ZERO        = 16'sh0000; // 0.0
-    parameter int Q15_MINUS_ONE   = 16'sh8000; // -1.0
+    localparam int Q15_WIDTH       = 16;
+    localparam int Q15_FRAC        = 15;
+    localparam int Q15_ONE         = 16'sh7FFF; // +0.999969 (~1.0)
+    localparam int Q15_ZERO        = 16'sh0000; // 0.0
+    localparam int Q15_MINUS_ONE   = 16'sh8000; // -1.0
 
-    parameter int PROD_WIDTH      = 32;
-    parameter int PROD_FRAC       = 30;
-    parameter int ACCUM_GUARD     = 2;
-    parameter int ACCUM_WIDTH     = PROD_WIDTH + ACCUM_GUARD; // 34-bit
+    localparam int PROD_WIDTH      = 32;
+    localparam int PROD_FRAC       = 30;
+    localparam int ACCUM_GUARD     = 2;
+    localparam int ACCUM_WIDTH     = PROD_WIDTH + ACCUM_GUARD; // 34-bit
 
     typedef logic signed [Q15_WIDTH-1:0]    q15_t;
     typedef logic signed [PROD_WIDTH-1:0]   prod_q2_30_t;
