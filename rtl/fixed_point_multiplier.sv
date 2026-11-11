@@ -9,9 +9,13 @@
 
 `timescale 1ns / 1ps
 
-module fixed_point_multiplier
-    import fdi_pkg::*;
-(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module fixed_point_multiplier (
     input  logic              clk,
     input  logic              rst_n,
     input  logic              en,
@@ -60,4 +64,3 @@ module fixed_point_multiplier
     assign overflow_out = overflow_q;
 
 endmodule
-

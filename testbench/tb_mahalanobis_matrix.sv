@@ -9,9 +9,13 @@
 
 `timescale 1ns / 1ps
 
-module tb_mahalanobis_matrix;
+`ifndef FDI_PKG_SV
+`include "../rtl/fdi_pkg.sv"
+`endif
 
-    import fdi_pkg::*;
+import fdi_pkg::*;
+
+module tb_mahalanobis_matrix;
 
     logic clk;
     logic rst_n;
@@ -139,4 +143,3 @@ module tb_mahalanobis_matrix;
     end
 
 endmodule
-

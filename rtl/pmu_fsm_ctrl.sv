@@ -12,9 +12,13 @@
 
 `timescale 1ns / 1ps
 
-module pmu_fsm_ctrl
-    import fdi_pkg::*;
-(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module pmu_fsm_ctrl (
     input  logic              clk,
     input  logic              rst_n,
 
@@ -168,4 +172,3 @@ module pmu_fsm_ctrl
     assign current_state_o = current_state;
 
 endmodule
-

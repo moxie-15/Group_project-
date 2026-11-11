@@ -45,3 +45,4 @@ puts "  Simulation outputs:  $SIM_DIR/results/rtl_simulation_output.csv"
 puts "=========================================================================="
 
 close_sim
+

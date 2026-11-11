@@ -10,9 +10,13 @@
 
 `timescale 1ns / 1ps
 
-module pmu_state_bram
-    import fdi_pkg::*;
-#(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module pmu_state_bram #(
     parameter int DEPTH        = MAX_CHANNELS,
     parameter int ADDR_WIDTH   = CHANNEL_BITS,
     parameter int STATE_WIDTH  = $bits(pmu_channel_state_t) // 61 bits
@@ -52,4 +56,3 @@ module pmu_state_bram
     assign dout = pmu_channel_state_t'(dout_reg);
 
 endmodule
-

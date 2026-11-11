@@ -10,9 +10,13 @@
 
 `timescale 1ns / 1ps
 
-module mahalanobis_matrix_engine
-    import fdi_pkg::*;
-#(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module mahalanobis_matrix_engine #(
     parameter int N = N_CHANNELS
 )(
     input  logic              clk,
@@ -157,4 +161,3 @@ module mahalanobis_matrix_engine
     assign done_o        = done_reg;
 
 endmodule
-

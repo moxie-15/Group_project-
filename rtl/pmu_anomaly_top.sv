@@ -14,9 +14,13 @@
 
 `timescale 1ns / 1ps
 
-module pmu_anomaly_top
-    import fdi_pkg::*;
-#(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module pmu_anomaly_top #(
     parameter int N = N_CHANNELS // Default 4 channels
 )(
     input  logic              clk,
@@ -255,4 +259,3 @@ module pmu_anomaly_top
     assign channel_active_o  = chan_ptr_q;
 
 endmodule
-

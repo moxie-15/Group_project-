@@ -6,6 +6,9 @@
 //              fixed-point types, intermediate widths, and saturation helpers.
 // ============================================================================
 
+`ifndef FDI_PKG_SV
+`define FDI_PKG_SV
+
 package fdi_pkg;
 
     // ------------------------------------------------------------------------
@@ -141,3 +144,5 @@ package fdi_pkg;
     endfunction
 
 endpackage: fdi_pkg
+
+`endif // FDI_PKG_SV

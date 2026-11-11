@@ -8,9 +8,13 @@
 
 `timescale 1ns / 1ps
 
-module fixed_point_accumulator
-    import fdi_pkg::*;
-#(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module fixed_point_accumulator #(
     parameter int IN_WIDTH   = PROD_WIDTH,  // Default 32-bit input (Q2.30)
     parameter int ACC_WIDTH  = ACCUM_WIDTH, // Default 34-bit accumulator (Q4.30)
     parameter int GUARD_BITS = ACCUM_GUARD  // 2 guard bits for N=4 sum
@@ -78,4 +82,3 @@ module fixed_point_accumulator
     assign overflow_out = overflow_reg;
 
 endmodule
-

@@ -167,3 +167,4 @@ python python/plots.py
   - `latency_cdf.png`: Shows detection speed.
 
 You can paste these images directly into your PowerPoint slides and report!
+

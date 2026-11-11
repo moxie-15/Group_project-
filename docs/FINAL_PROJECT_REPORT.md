@@ -170,3 +170,4 @@ Automated Tcl scripts are provided in `scripts/`:
 ## 7. Conclusion & Future Scalability
 
 This project successfully proves the feasibility and high performance of hardware-accelerated statistical anomaly detection for smart grids. The modular architecture easily scales to larger power grids (e.g., IEEE 30-bus, IEEE 118-bus) by expanding the dimension parameter `N_DIM` and precision matrix memory depth without altering the core Three-Process Moore FSM or CUSUM filter topology.
+

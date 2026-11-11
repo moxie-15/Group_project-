@@ -10,9 +10,13 @@
 
 `timescale 1ns / 1ps
 
-module cusum_filter_q15
-    import fdi_pkg::*;
-(
+`ifndef FDI_PKG_SV
+`include "fdi_pkg.sv"
+`endif
+
+import fdi_pkg::*;
+
+module cusum_filter_q15 (
     input  logic              clk,
     input  logic              rst_n,
     input  logic              sample_valid,   // Single-cycle enable from FSM
@@ -105,4 +109,3 @@ module cusum_filter_q15
     assign alert_cusum_o   = alert_pos_reg || alert_neg_reg;
 
 endmodule
-
