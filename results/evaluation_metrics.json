@@ -1,0 +1,107 @@
+{
+    "dataset_samples": 1000,
+    "attack_samples": 471,
+    "clean_samples": 529,
+    "proposed_dual_layer": {
+        "metrics": {
+            "TP": 359,
+            "FP": 11,
+            "TN": 518,
+            "FN": 112,
+            "Accuracy": 0.877,
+            "Precision": 0.9702702702702702,
+            "Recall": 0.7622080679405521,
+            "F1_Score": 0.853745541022592,
+            "FPR": 0.020793950850661626,
+            "FNR": 0.23779193205944799
+        },
+        "latencies": {
+            "Scenario 1: Abrupt FDI": {
+                "detected": true,
+                "latency_samples": 0,
+                "start_sample": 200,
+                "first_detect_sample": 200
+            },
+            "Scenario 2: Gradual Drift": {
+                "detected": true,
+                "latency_samples": 76,
+                "start_sample": 500,
+                "first_detect_sample": 576
+            },
+            "Scenario 3: Stealthy Subspace": {
+                "detected": true,
+                "latency_samples": 0,
+                "start_sample": 800,
+                "first_detect_sample": 800
+            }
+        }
+    },
+    "baseline_mahalanobis_only": {
+        "metrics": {
+            "TP": 337,
+            "FP": 4,
+            "TN": 525,
+            "FN": 134,
+            "Accuracy": 0.862,
+            "Precision": 0.9882697947214076,
+            "Recall": 0.7154989384288747,
+            "F1_Score": 0.8300492610837438,
+            "FPR": 0.007561436672967864,
+            "FNR": 0.28450106157112526
+        },
+        "latencies": {
+            "Scenario 1: Abrupt FDI": {
+                "detected": true,
+                "latency_samples": 0,
+                "start_sample": 200,
+                "first_detect_sample": 200
+            },
+            "Scenario 2: Gradual Drift": {
+                "detected": true,
+                "latency_samples": 76,
+                "start_sample": 500,
+                "first_detect_sample": 576
+            },
+            "Scenario 3: Stealthy Subspace": {
+                "detected": true,
+                "latency_samples": 0,
+                "start_sample": 800,
+                "first_detect_sample": 800
+            }
+        }
+    },
+    "baseline_cusum_only": {
+        "metrics": {
+            "TP": 351,
+            "FP": 7,
+            "TN": 522,
+            "FN": 120,
+            "Accuracy": 0.873,
+            "Precision": 0.9804469273743017,
+            "Recall": 0.7452229299363057,
+            "F1_Score": 0.8468033775633295,
+            "FPR": 0.013232514177693762,
+            "FNR": 0.25477707006369427
+        },
+        "latencies": {
+            "Scenario 1: Abrupt FDI": {
+                "detected": true,
+                "latency_samples": 0,
+                "start_sample": 200,
+                "first_detect_sample": 200
+            },
+            "Scenario 2: Gradual Drift": {
+                "detected": true,
+                "latency_samples": 110,
+                "start_sample": 500,
+                "first_detect_sample": 610
+            },
+            "Scenario 3: Stealthy Subspace": {
+                "detected": true,
+                "latency_samples": 2,
+                "start_sample": 800,
+                "first_detect_sample": 802
+            }
+        }
+    }
+}

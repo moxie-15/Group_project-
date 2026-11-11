@@ -1,0 +1,23 @@
+# Vivado Project Files & Logs
+*.log
+*.jou
+*.str
+*.pb
+*.rpt
+vivado/project/*.cache/
+vivado/project/*.hw/
+vivado/project/*.ip_user_files/
+vivado/project/*.runs/
+vivado/project/*.sim/
+vivado/project/*.srcs/
+vivado/reports/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OS Specific
+.DS_Store
+Thumbs.db
