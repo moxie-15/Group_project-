@@ -78,18 +78,26 @@
   framexleftmargin=1em
 }
 
-% ---------------- SAFE FIGURE COMMAND ----------------
+% ---------------- SAFE FIGURE COMMAND (SUPPORTS PNG & JPG) ----------------
 \newcommand{\reportfigure}[4][0.9\textwidth]{%
 \begin{figure}[htbp]
 \centering
 \IfFileExists{results/#2}{%
-  \includegraphics[width=#1]{#2}%
+  \includegraphics[width=#1]{results/#2}%
 }{%
-  \fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering
-  \textbf{Figure file not supplied}\\[0.4em]
-  Expected file: \texttt{results/#2}\\[0.4em]
-  Upload the corresponding generated plot to the Overleaf
-  project before final submission.}}%
+  \IfFileExists{results/#2.png}{%
+    \includegraphics[width=#1]{results/#2.png}%
+  }{%
+    \IfFileExists{results/#2.jpg}{%
+      \includegraphics[width=#1]{results/#2.jpg}%
+    }{%
+      \fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering
+      \textbf{Figure file not supplied}\\[0.4em]
+      Expected file: \texttt{results/#2} (or \texttt{.png} / \texttt{.jpg})\\[0.4em]
+      Upload the corresponding generated plot to the Overleaf
+      project before final submission.}}%
+    }%
+  }%
 }
 \caption{#3}
 \label{#4}
