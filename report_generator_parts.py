@@ -42,7 +42,32 @@ def get_preamble():
 \setlength{\headheight}{15pt}
 \setlength{\parindent}{0.35in}
 \setlength{\parskip}{0pt}
+% ---------------- APA 7TH EDITION UNNUMBERED REFERENCES ----------------
 \renewcommand{\bibname}{References}
+\makeatletter
+\def\@cite#1#2{({#1\if@tempswa , #2\fi})}
+\def\@biblabel#1{}
+\renewenvironment{thebibliography}[1]{%
+  \chapter*{\bibname}%
+  \addcontentsline{toc}{chapter}{\bibname}%
+  \list{}{%
+    \setlength{\labelwidth}{0pt}%
+    \setlength{\labelsep}{0pt}%
+    \setlength{\leftmargin}{0.35in}%
+    \setlength{\itemindent}{-0.35in}%
+    \setlength{\itemsep}{6pt}%
+    \setlength{\parsep}{0pt}%
+    \usecounter{enumiv}%
+    \let\p@enumiv\@empty
+    \renewcommand\theenumiv{\@arabic\c@enumiv}%
+  }%
+  \sloppy\clubpenalty4000\widowpenalty4000%
+  \sfcode`\.=1000\relax
+}{%
+  \endlist
+}
+\makeatother
+
 
 
 

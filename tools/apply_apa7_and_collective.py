@@ -176,3 +176,4 @@ with open('chapter_six_and_backmatter_generator.py', 'w', encoding='utf-8') as f
     f.write(text)
 
 print("Updated chapter_six_and_backmatter_generator.py successfully.")
+
