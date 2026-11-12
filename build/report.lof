@@ -1,0 +1,22 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Hardware architecture selection and processing partition.}}{21}{}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Elaborated top-level RTL schematic of the PMU anomaly engine.}}{22}{}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Circuit-level schematic of the fixed-point arithmetic datapath.}}{23}{}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Vivado synthesis technology mapping on Artix-7 XC7A200T fabric.}}{31}{}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Detailed CLB slice and DSP48E1 placement layout.}}{31}{}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Four-channel PMU telemetry under simulated cyber-attack scenarios.}}{33}{}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Squared Mahalanobis distance statistic versus decision threshold.}}{33}{}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Two-sided CUSUM accumulator trajectories versus decision threshold.}}{34}{}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Global anomaly detection alert timeline across attack scenarios.}}{34}{}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Direct comparison between classical Chi-Square BDD and proposed Mahalanobis distance.}}{34}{}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Receiver Operating Characteristic (ROC) curve comparison.}}{35}{}%
+\contentsline {figure}{\numberline {5.9}{\ignorespaces Empirical detection delay versus cyber-attack perturbation magnitude.}}{35}{}%
+\contentsline {figure}{\numberline {5.10}{\ignorespaces Average Run Length (ARL) operational trade-off curve.}}{36}{}%
+\contentsline {figure}{\numberline {5.11}{\ignorespaces Cumulative distribution function (CDF) of empirical detection latency.}}{36}{}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

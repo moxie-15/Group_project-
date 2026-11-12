@@ -307,7 +307,7 @@ Following accumulation, the 34-bit value is scaled back to 16 bits using converg
 rounding by adding $+2^{14} = \text{0x0000\_4000}$ before truncating bits $[30:15]$. To protect
 against two's-complement arithmetic overflow (e.g., $-1.0 \times -1.0 = +1.0$, which exceeds
 the maximum positive Q1.15 representable value of $+0.999969$), dedicated saturation logic
-clamps any overflow to `0x7FFF` (+0.999969) and any underflow to `0x8000` (-1.0).
+clamps any overflow to \texttt{0x7FFF} (+0.999969) and any underflow to \texttt{0x8000} (-1.0).
 
 \section{Project Calibration Parameters and Fixed-Point Wordlengths}
 Table~\ref{tab:q15_params} summarizes the complete fixed-point parameter configuration,
@@ -388,3 +388,4 @@ models are verified experimentally against Vivado synthesis reports in Chapter F
 """
 
 print("Chapter 3 module loaded.")
+

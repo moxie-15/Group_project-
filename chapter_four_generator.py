@@ -32,13 +32,13 @@ mathematics and physical digital hardware, the engineering methodology follows a
     hardware topologies.
     \item \textbf{Step 5: Synthesizable RTL Description:} Code the design in SystemVerilog
     (IEEE 1800-2017) using fully parameterizable word lengths and strictly synthesizable constructs.
-    \item \textbf{Step 6: Functional & Assertion-Based Verification:} Construct self-checking
+    \item \textbf{Step 6: Functional \& Assertion-Based Verification:} Construct self-checking
     SystemVerilog testbenches with known-answer test (KAT) vectors and automated mismatch detection.
     \item \textbf{Step 7: Logic Synthesis and Technology Mapping:} Synthesize the RTL in AMD/Xilinx
     Vivado in accordance with Vivado synthesis and constraint guidelines \cite{ug901,ug903,ug907} targeting the Artix-7 XC7A200T FPGA; extract resource utilization (LUTs, FFs, DSPs, BRAM).
     \item \textbf{Step 8: Timing and Power Analysis:} Evaluate static timing slack (WNS/WHS),
     maximum clock frequency ($f_{\max}$), and dynamic power consumption via Vivado report tools.
-    \item \textbf{Step 9: Automated Telemetry & CSV Data Export:} Execute automated regression
+    \item \textbf{Step 9: Automated Telemetry \& CSV Data Export:} Execute automated regression
     scripts that write hardware outputs to CSV format for statistical performance analysis.
     \item \textbf{Step 10: Reproducibility Package Assembly:} Archive all RTL, testbenches, Python
     scripts, synthesis Tcl files, and raw simulation datasets into an open, documented repository.
@@ -101,16 +101,16 @@ offline calibration and dedicated FPGA hardware execution.
 
 \reportfigure[0.85\textwidth]{hardware_choose}{Hardware architecture selection and processing partition.}{fig:hardware_choose}
 
-The hardware architecture (`pmu_anomaly_top.sv`) decomposes the anomaly detection engine
+The hardware architecture (\texttt{pmu\_anomaly\_top.sv}) decomposes the anomaly detection engine
 into dedicated, interacting functional blocks:
 \begin{itemize}
-    \item \textbf{Master FSM Controller (`pmu_fsm_ctrl`):} Coordinates synchronous sample
+    \item \textbf{Master FSM Controller (\texttt{pmu\_fsm\_ctrl}):} Coordinates synchronous sample
     capture, datapath handshakes, threshold evaluations, and state memory write-backs.
-    \item \textbf{Mahalanobis Matrix Engine (`mahalanobis_matrix_engine`):} Computes spatial
+    \item \textbf{Mahalanobis Matrix Engine (\texttt{mahalanobis\_matrix\_engine}):} Computes spatial
     matrix-vector multiplication and quadratic dot product using dedicated DSP48E1 slices.
-    \item \textbf{Two-Sided CUSUM Core (`cusum_filter_q15`):} Implements signed positive and
+    \item \textbf{Two-Sided CUSUM Core (\texttt{cusum\_filter\_q15}):} Implements signed positive and
     negative recursive accumulations with zero-clamping logic.
-    \item \textbf{Time-Multiplexed State Memory (`pmu_state_bram`):} Stores per-channel CUSUM
+    \item \textbf{Time-Multiplexed State Memory (\texttt{pmu\_state\_bram}):} Stores per-channel CUSUM
     accumulator states and history flags in dual-port Block RAM.
 \end{itemize}
 
@@ -135,12 +135,12 @@ The datapath incorporates four critical hardware safeguards:
     \item \textbf{Convergent Half-Up Rounding:} Rescaling from 34 bits back to 16 bits adds
     $+2^{14} = \text{0x0000\_4000}$ before truncating bits $[30:15]$, eliminating negative DC bias.
     \item \textbf{Two's-Complement Saturation Logic:} Prevents negative overflow wrapping;
-    excursions beyond $+0.999969$ clamp strictly to `0x7FFF`, and negative excursions clamp to `0x8000`.
+    excursions beyond $+0.999969$ clamp strictly to \texttt{0x7FFF}, and negative excursions clamp to \texttt{0x8000}.
 \end{enumerate}
 
 \section{Main Controller Finite-State Machine}
 The operational sequencing of the hardware engine is governed by a canonical three-process
-Moore Finite State Machine implemented in `rtl/pmu_fsm_ctrl.sv`. Process~1 executes the
+Moore Finite State Machine implemented in \texttt{rtl/pmu\_fsm\_ctrl.sv}. Process~1 executes the
 sequential state register with asynchronous active-low reset; Process~2 evaluates combinational
 next-state transition logic; and Process~3 generates pure Moore output strobes derived
 strictly from the current state. Table~\ref{tab:fsm_states} details the complete operational
@@ -176,7 +176,7 @@ sequence, matching the actual RTL implementation.
 \end{table}
 
 \section{Mahalanobis Matrix Engine Datapath}
-The Mahalanobis engine (`rtl/mahalanobis_matrix_engine.sv`) computes the quadratic form
+The Mahalanobis engine (\texttt{rtl/mahalanobis\_matrix\_engine.sv}) computes the quadratic form
 $D^2 = \boldsymbol{r}^T \boldsymbol{W} \boldsymbol{r}$ over a fully pipelined 3-cycle sequence:
 \begin{itemize}
     \item \textbf{Cycle 1 (Matrix-Vector Multiplication):} Four parallel row-MAC units multiply
@@ -192,13 +192,13 @@ $D^2 = \boldsymbol{r}^T \boldsymbol{W} \boldsymbol{r}$ over a fully pipelined 3-
     D^2 = \sum_{i=1}^4 r_i y_i.
     \end{equation}
     This summation is accumulated in a 34-bit register with 2 guard bits.
-    \item \textbf{Cycle 3 (Rounding & Output Registration):} The 34-bit accumulator value is
+    \item \textbf{Cycle 3 (Rounding \& Output Registration):} The 34-bit accumulator value is
     rounded to Q1.15 using convergent half-up rounding, saturated, registered onto the output
     port, and the completion strobe \texttt{mahal\_done} is asserted.
 \end{itemize}
 
 \section{Two-Sided CUSUM Sequential RTL Datapath}
-The CUSUM core (`rtl/cusum_filter_q15.sv`) executes Equations~\eqref{eq:ch3_cusum_pos} and
+The CUSUM core (\texttt{rtl/cusum\_filter\_q15.sv}) executes Equations~\eqref{eq:ch3_cusum_pos} and
 \eqref{eq:ch3_cusum_neg} in a single clock cycle. The incoming preprocessed measurement $y_t$
 is subtracted from reference mean $\nu_0$ and reference allowance $k$:
 \begin{align}
@@ -212,7 +212,7 @@ Parallel threshold comparators compare $S_t^+$ and $S_t^-$ against $h$, assertin
 alarm strobe if either threshold is crossed.
 
 \section{Dual-Port BRAM / LUTRAM State Storage}
-The anomaly engine incorporates embedded memory (`rtl/pmu_state_bram.sv`) to maintain CUSUM
+The anomaly engine incorporates embedded memory (\texttt{rtl/pmu\_state\_bram.sv}) to maintain CUSUM
 accumulator states across successive sample frames. The per-channel state record packs 42 bits:
 \begin{itemize}
     \item Positive Accumulator ($S^+$): 16 bits Q1.15.
@@ -278,9 +278,9 @@ The verification hierarchy comprises two complementary layers:
     \texttt{tb\_fixed\_point\_multiplier.sv} verifies rounding and saturation corner cases;
     \texttt{tb\_mahalanobis\_matrix.sv} tests matrix-vector dot products against precomputed
     algebraic vectors; \texttt{tb\_cusum\_filter.sv} tests positive/negative drift clamping.
-    \item \textbf{System-Level Testbench (`tb\_pmu\_anomaly\_top`):} Feeds the entire 1,200-frame
-    telemetry sequence from `pmu_telemetry.csv` through the top-level RTL entity, logs hardware
-    alerts and scores to `rtl_output.csv`, and performs automated assertion checks against the
+    \item \textbf{System-Level Testbench (\texttt{tb\_pmu\_anomaly\_top}):} Feeds the entire 1,200-frame
+    telemetry sequence from \texttt{pmu\_telemetry.csv} through the top-level RTL entity, logs hardware
+    alerts and scores to \texttt{rtl\_output.csv}, and performs automated assertion checks against the
     Python golden model.
 \end{enumerate}
 """

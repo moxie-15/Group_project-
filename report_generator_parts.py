@@ -14,7 +14,7 @@ def get_preamble():
 % Department of Computer Engineering, Redeemer's University, Ede
 % =====================================================================
 
-\documentclass[12pt,a4paper]{report}
+\documentclass[11pt,a4paper]{report}
 
 % ---------------- PACKAGES ----------------
 \usepackage[utf8]{inputenc}
@@ -27,34 +27,23 @@ def get_preamble():
 \usepackage{float}
 \usepackage{placeins}
 \usepackage{booktabs}
-\usepackage{longtable}
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{caption}
-\usepackage{subcaption}
 \usepackage{cite}
 \usepackage{url}
-\usepackage[hidelinks]{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
-\usepackage{siunitx}
 
 % ---------------- PAGE FORMATTING ----------------
-\geometry{left=1.25in,right=1in,top=1in,bottom=1in}
-\onehalfspacing
+\geometry{left=0.85in,right=0.85in,top=0.85in,bottom=0.85in}
+\setstretch{1.08}
 \setlength{\headheight}{15pt}
-\setlength{\parindent}{0.5in}
+\setlength{\parindent}{0.35in}
 \setlength{\parskip}{0pt}
 
-\hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    citecolor=blue,
-    urlcolor=blue
-}
+
 
 \pagestyle{fancy}
 \fancyhf{}
@@ -80,7 +69,7 @@ def get_preamble():
 }
 
 % ---------------- SAFE FIGURE COMMAND (SUPPORTS PNG & JPG) ----------------
-\newcommand{\reportfigure}[4][0.9\textwidth]{%
+\newcommand{\reportfigure}[4][0.58\textwidth]{%
 \begin{figure}[htbp]
 \centering
 \IfFileExists{results/#2}{%
@@ -163,8 +152,10 @@ Fulfilment of the Requirements for CPE 503\\
 % =====================================================================
 \pagenumbering{roman}
 
-\chapter*{Declaration}
-\addcontentsline{toc}{chapter}{Declaration}
+\chapter*{Declaration and Acknowledgements}
+\addcontentsline{toc}{chapter}{Declaration and Acknowledgements}
+
+\subsection*{Declaration of Originality}
 We declare that this report presents the original work undertaken by Group 9
 for the CPE 503 (Embedded Systems) project in the Department of Computer
 Engineering, Redeemer's University, Ede. All sources consulted, including
@@ -177,8 +168,8 @@ represented as a completed physical experiment, and all design boundaries,
 unconstrained timing paths, and interface limitations are reported with complete
 academic integrity.
 
-\chapter*{Acknowledgements}
-\addcontentsline{toc}{chapter}{Acknowledgements}
+\vspace{0.8cm}
+\subsection*{Acknowledgements}
 The members of Group 9 express their sincere gratitude to the course
 lecturer, the Department of Computer Engineering, and the Faculty of
 Engineering at Redeemer's University, Ede, for their academic leadership,
@@ -240,3 +231,4 @@ Mahalanobis Distance, Two-Sided CUSUM, FPGA Architecture, SystemVerilog, Artix-7
 """
 
 print("Front matter module loaded.")
+

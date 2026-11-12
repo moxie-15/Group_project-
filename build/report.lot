@@ -1,0 +1,18 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {2.1}{\ignorespaces Major domains of the NIST smart grid conceptual model.}}{7}{}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Comparison of related works in smart grid FDI anomaly detection.}}{9}{}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {3.1}{\ignorespaces Notation and mathematical symbols used throughout the report.}}{12}{}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Fixed-point Q1.15 design parameters and quantization boundaries.}}{17}{}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces FSM states and operational sequence of the PMU controller.}}{24}{}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Hardware timing and complexity analysis.}}{26}{}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Quantitative detection performance of CUSUM, Mahalanobis, and Proposed Hybrid engines.}}{29}{}%
+\contentsline {table}{\numberline {5.2}{\ignorespaces Vivado FPGA resource utilization for the Artix-7 target device.}}{30}{}%
+\contentsline {table}{\numberline {5.3}{\ignorespaces Ablation study across four distinct attack regimes.}}{32}{}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {6.1}{\ignorespaces Project completion and evidence status.}}{38}{}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
