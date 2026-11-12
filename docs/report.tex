@@ -24,6 +24,8 @@
 \usepackage{xcolor}
 \usepackage{fancyhdr}
 \usepackage{placeins}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
 
 % -----------------------------------------------------------------------------
 % PAGE FORMATTING (1-inch margins, 1.5 line spacing as required by Redeemer's University)
@@ -482,6 +484,43 @@ Control flow strictly follows the canonical Three-Process Moore FSM methodology 
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm and 1.5cm,
+    state/.style={rectangle, rounded corners=4pt, draw=blue!70!black, fill=blue!5, thick, inner sep=5pt, text width=3.2cm, align=center, font=\footnotesize\bfseries},
+    edge/.style={->, >=Latex, thick, draw=black!75},
+    ann/.style={font=\scriptsize\itshape, text=black!85}
+]
+
+% Nodes arranged in a clear loop
+\node[state] (idle)       {\texttt{FSM\_IDLE}\\ \scriptsize \texttt{data\_ready=1}};
+\node[state] (capture)    [below=of idle] {\texttt{FSM\_CAPTURE}\\ \scriptsize \texttt{latch\_sample=1}};
+\node[state] (prep)       [below=of capture] {\texttt{FSM\_PREPROCESS}\\ \scriptsize \texttt{preprocess\_en=1}};
+\node[state] (mahal)      [right=1.8cm of prep] {\texttt{FSM\_MAHALANOBIS}\\ \scriptsize \texttt{mahal\_start=1}};
+\node[state] (cusum)      [right=1.8cm of capture] {\texttt{FSM\_CUSUM}\\ \scriptsize \texttt{cusum\_en=1}};
+\node[state] (decision)   [right=1.8cm of idle] {\texttt{FSM\_DECISION}\\ \scriptsize \texttt{decision\_en=1}};
+\node[state] (store)      [right=1.8cm of decision] {\texttt{FSM\_STORE\_RESULT}\\ \scriptsize \texttt{bram\_we=1}};
+\node[state] (next)       [below=of store] {\texttt{FSM\_NEXT\_CHANNEL}\\ \scriptsize \texttt{chan\_advance=1}};
+
+% Edges
+\path[edge] (idle) edge node[left, ann] {\texttt{data\_valid=1}} (capture);
+\path[edge] (idle) edge[loop left] node[left, ann] {\texttt{!data\_valid}} (idle);
+\path[edge] (capture) edge (prep);
+\path[edge] (prep) edge (mahal);
+\path[edge] (mahal) edge[loop below] node[below, ann] {\texttt{!mahal\_done}} (mahal);
+\path[edge] (mahal) edge node[right, ann] {\texttt{mahal\_done=1}} (cusum);
+\path[edge] (cusum) edge (decision);
+\path[edge] (decision) edge (store);
+\path[edge] (store) edge (next);
+\path[edge] (next) edge[bend right=40] node[above, ann] {\texttt{channel\_last=1}} (idle);
+\path[edge] (next) edge[dashed, bend left=20] node[below, ann] {\texttt{!channel\_last}} (capture);
+
+\end{tikzpicture}
+\caption{Three-Process Moore Finite State Machine (FSM) State Transition Diagram showing the deterministic execution graph across time-multiplexed channels.}
+\label{fig:fsm_state_diagram}
+\end{figure}
 
 \section{Cycle Count and Throughput Model}
 From Table \ref{tab:fsm_cycles}, processing one channel requires 9 clock cycles:
