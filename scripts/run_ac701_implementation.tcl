@@ -65,3 +65,4 @@ puts "    - Timing & Slack: vivado/reports/ac701_timing_summary.rpt"
 puts "    - Resources:      vivado/reports/ac701_utilization.rpt"
 puts "    - Power:          vivado/reports/ac701_power.rpt"
 puts "=========================================================================="
+

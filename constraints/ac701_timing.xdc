@@ -66,3 +66,4 @@ set_output_delay -clock [get_clocks clk] -max 2.000 [get_ports cusum_s_neg_o*]
 set_output_delay -clock [get_clocks clk] -min 0.500 [get_ports cusum_s_neg_o*]
 set_output_delay -clock [get_clocks clk] -max 2.000 [get_ports channel_active_o*]
 set_output_delay -clock [get_clocks clk] -min 0.500 [get_ports channel_active_o*]
+
