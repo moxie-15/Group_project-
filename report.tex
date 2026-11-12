@@ -1,8 +1,21 @@
+% =====================================================================
+% CPE 503 — GROUP 09 — PROBLEM 9
+% Smart Grid FDI Anomaly Detection Engine via CUSUM and Mahalanobis Distance
+% Single-file, Overleaf-ready technical report
+%
+% EDITING NOTES:
+% 1. Group members inserted.
+% 2. Upload the PNG figures into a folder named "results".
+%    Rename files with spaces to match the filenames below (see comment
+%    block at top of Chapter 5).
+% 3. Reconcile the metric/resource discrepancies (1,000 vs 1,200 frames;
+%    1,193 vs 1,381 LUTs) against the original CSV and Vivado .rpt files.
+% 4. Compile with pdfLaTeX (run twice for references/contents).
+% =====================================================================
+
 \documentclass[12pt,a4paper]{report}
 
-% -----------------------------------------------------------------------------
-% PACKAGES
-% -----------------------------------------------------------------------------
+% ---------------- PACKAGES ----------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
@@ -11,6 +24,7 @@
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{placeins}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
@@ -19,25 +33,20 @@
 \usepackage{subcaption}
 \usepackage{cite}
 \usepackage{url}
-\usepackage{hyperref}
+\usepackage[hidelinks]{hyperref}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{fancyhdr}
-\usepackage{placeins}
 \usepackage{tikz}
-\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit}
+\usepackage{siunitx}
 
-% -----------------------------------------------------------------------------
-% PAGE FORMATTING (1-inch margins, 1.5 line spacing as required by Redeemer's University)
-% -----------------------------------------------------------------------------
-\geometry{
-    left=1.25in,
-    right=1.00in,
-    top=1.00in,
-    bottom=1.00in
-}
-
+% ---------------- PAGE FORMATTING ----------------
+\geometry{left=1.25in,right=1in,top=1in,bottom=1in}
 \onehalfspacing
+\setlength{\headheight}{15pt}
+\setlength{\parindent}{0.5in}
+\setlength{\parskip}{0pt}
 
 \hypersetup{
     colorlinks=true,
@@ -48,865 +57,1999 @@
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small CPE 503: Embedded Systems Project Report}
-\fancyhead[R]{\small Group 09 --- Problem 9}
+\fancyhead[L]{Group 9}
+\fancyhead[R]{Smart Grid FDI Anomaly Engine}
 \fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
 
-% Image directory (figures in results/)
-\graphicspath{{results/}{../results/}}
+\graphicspath{{results/}}
 
-% Code Listing Styling
 \lstset{
-    basicstyle=\ttfamily\footnotesize,
-    breaklines=true,
-    frame=single,
-    numbers=left,
-    numberstyle=\tiny\color{gray},
-    keywordstyle=\color{blue}\bfseries,
-    commentstyle=\color{green!50!black}\itshape,
-    stringstyle=\color{red}
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  frame=single,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{teal},
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny,
+  xleftmargin=1.5em,
+  framexleftmargin=1em
 }
 
-% -----------------------------------------------------------------------------
-% DOCUMENT INFORMATION
-% -----------------------------------------------------------------------------
-\title{
-    \textbf{SMART GRID FALSE DATA INJECTION (FDI) ANOMALY ENGINE VIA CUSUM AND MAHALANOBIS DISTANCE}
+% ---------------- SAFE FIGURE COMMAND ----------------
+\newcommand{\reportfigure}[4][0.9\textwidth]{%
+\begin{figure}[htbp]
+\centering
+\IfFileExists{results/#2}{%
+  \includegraphics[width=#1]{#2}%
+}{%
+  \fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering
+  \textbf{Figure file not supplied}\\[0.4em]
+  Expected file: \texttt{results/#2}\\[0.4em]
+  Upload the corresponding generated plot to the Overleaf
+  project before final submission.}}%
 }
-\author{Group 09 --- Department of Computer Engineering, Redeemer's University, Ede}
+\caption{#3}
+\label{#4}
+\end{figure}
+}
+
+% ---------------- DOCUMENT INFORMATION ----------------
+\title{\textbf{SMART GRID FALSE DATA INJECTION (FDI) ANOMALY DETECTION ENGINE VIA CUSUM AND MAHALANOBIS DISTANCE}}
+\author{Group 9\\Department of Computer Engineering\\Redeemer's University, Ede}
 \date{November 2026}
 
 \begin{document}
 
-% =============================================================================
+% =====================================================================
 % TITLE PAGE
-% =============================================================================
+% =====================================================================
 \begin{titlepage}
 \centering
+\vspace*{1cm}
+{\Large\textbf{REDEEMER'S UNIVERSITY, EDE}}\\[0.4cm]
+{\large Department of Computer Engineering}\\
+{\large Faculty of Engineering}
 
-\vspace*{0.5cm}
-{\Large\textbf{REDEEMER'S UNIVERSITY, EDE}}\\[0.3cm]
-{\large Faculty of Engineering}\\[0.2cm]
-{\large Department of Computer Engineering}\\[1.0cm]
+\vspace{1.5cm}
+{\Large\textbf{GROUP 9 PROJECT REPORT}}\\[1cm]
 
-\includegraphics[width=0.25\textwidth]{results/roc_curve.png}\\[0.8cm] % Project Representative Emblem
+{\LARGE\textbf{
+SMART GRID FALSE DATA INJECTION (FDI)\\
+ANOMALY DETECTION ENGINE VIA CUSUM AND\\
+MAHALANOBIS DISTANCE
+}}
 
-{\Large\textbf{CPE 503: EMBEDDED SYSTEMS PROJECT REPORT}}\\[0.8cm]
+\vspace{1.5cm}
+\textbf{A Technical Report Submitted in Partial\\
+Fulfilment of the Requirements for CPE 503}
 
-{\LARGE\textbf{SMART GRID FALSE DATA INJECTION (FDI) ANOMALY DETECTION ENGINE VIA CUSUM AND MAHALANOBIS DISTANCE}}\\[1.0cm]
+\vspace{1.5cm}
+\textbf{GROUP MEMBERS}\\[0.5cm]
 
-\textbf{A Technical Course Project Report Submitted in Partial Fulfilment of the Requirements for the Degree of Bachelor of Engineering (B.Eng.) in Computer Engineering}\\[1.0cm]
+\textsc{Adediwura Esther Oluwarasimi}\\
+-- RUN/CPE/22/12005\\[0.3cm]
 
-\textbf{GROUP 09 MEMBERS}\\[0.3cm]
-\begin{tabular}{ll}
-\textbf{Name} & \textbf{Matriculation Number} \\
-\midrule
-Member 1 (Algorithm \& Mathematics Lead) & RUN/CPE/XX/XXXX \\
-Member 2 (RTL Hardware Design Lead)      & RUN/CPE/XX/XXXX \\
-Member 3 (Verification \& Data Lead)      & RUN/CPE/XX/XXXX \\
-Member 4 (Literature \& Writing Lead)     & RUN/CPE/XX/XXXX \\
-\bottomrule
-\end{tabular}
+\textsc{Ololade John Ayotunde}\\
+-- RUN/CPE/22/12072\\[0.3cm]
+
+\textsc{Akubo Bright}\\
+-- RUN/CPE/22/120\\[0.3cm]
+
+\textsc{Ojo Oluwadamilare Samuel}\\
+-- RUN/CPE/22/12062
 
 \vfill
-\textbf{Course Lecturer: Department of Computer Engineering}\\
-\textbf{Date of Submission: Thursday, 12 November 2026}
+\textbf{November 2026}
 \end{titlepage}
 
-% =============================================================================
+% =====================================================================
 % PRELIMINARY PAGES
-% =============================================================================
+% =====================================================================
 \pagenumbering{roman}
 
 \chapter*{Declaration}
 \addcontentsline{toc}{chapter}{Declaration}
-We hereby declare that this project report titled \textit{``Smart Grid False Data Injection (FDI) Anomaly Detection Engine via CUSUM and Mahalanobis Distance''} is the authentic product of our research and digital hardware engineering design carried out under Course CPE 503 (Embedded Systems) in the Department of Computer Engineering, Redeemer's University, Ede. All external analytical theories, academic literature, hardware architectures, and benchmark parameters have been properly cited and acknowledged. We confirm that no simulation data or synthesis results have been fabricated.
-
-\vspace{1.5cm}
-\noindent\begin{tabular}{@{}ll@{}}
-\rule{6cm}{0.4pt} & \rule{6cm}{0.4pt} \\
-Member 1 (Algorithm Lead) & Member 2 (RTL Design Lead) \\[1.2cm]
-\rule{6cm}{0.4pt} & \rule{6cm}{0.4pt} \\
-Member 3 (Verification Lead) & Member 4 (Writing Lead) \\
-\end{tabular}
+We declare that this report presents the work undertaken by Group 9
+for the CPE 503 project. Sources consulted in carrying out the work
+have been acknowledged. The results are presented according to the
+available experimental and synthesis evidence, and no unperformed
+hardware test is represented as a completed experiment.
 
 \chapter*{Acknowledgements}
 \addcontentsline{toc}{chapter}{Acknowledgements}
-We express our profound gratitude to Almighty God for the intellect, guidance, and sustaining grace throughout the rigorous design, coding, synthesis, and verification phases of this embedded digital hardware project.
-
-We extend our sincere appreciation to our course lecturer in the Department of Computer Engineering, Redeemer's University, Ede, whose uncompromising insistence on technical rigor, mathematical derivation, reproducible `.csv' test benches, and honest academic reporting shaped this work. We also thank our fellow students for their collaborative reviews during peer debugging sessions.
+The group acknowledges the Department of Computer Engineering,
+Redeemer's University, and the course lecturer for the academic
+guidance and opportunity to undertake this project. We also acknowledge
+the developers and maintainers of the scientific, power-system and
+hardware-design tools used during the project.
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-Modern electrical transmission systems rely upon Phasor Measurement Units (PMUs) to stream high-frequency measurement telemetry to centralized Energy Management Systems (EMS). However, centralized State Estimation (SE) routines remain vulnerable to False Data Injection (FDI) attacks. By exploiting physical line admittance parameters, an adversary can synthesize an attack vector $a = Hc$ that lies within the measurement Jacobian subspace, leaving the classical Weighted Least Squares (WLS) measurement residual $r = z - H\hat{x}$ strictly invariant and tricking conventional Chi-square ($\chi^2$) Bad Data Detection (BDD) algorithms.
+False Data Injection (FDI) attacks are a cybersecurity threat to modern
+electric power systems because manipulated measurements can mislead
+state estimation and operational monitoring. Some carefully constructed
+attacks can evade conventional residual-based bad-data detection by
+preserving the structure expected by the estimator. This project
+develops a hardware-oriented statistical anomaly-detection prototype
+that combines a covariance-aware Mahalanobis-distance test with a
+two-sided Cumulative Sum (CUSUM) sequential test.
 
-To resolve this critical vulnerability, this project presents the architectural design, mathematical modeling, SystemVerilog RTL implementation, and FPGA synthesis of a real-time PMU edge-monitoring anomaly engine. The engine couples: (1) an $N$-dimensional multivariate \textbf{Mahalanobis Distance ($D^2$)} spatial correlation unit, and (2) a two-sided recursive \textbf{Cumulative Sum (CUSUM, $S^+, S^-$)} temporal change detector implemented in signed Q1.15 fixed-point arithmetic. Physical IEEE 14-bus test feeder telemetry ($1,200$ samples across Bus 1--2 transmission branch) was synthesized under four realistic cyber-attack scenarios: coordinated stealth ($a=Hc$), persistent linear ramp/drift, multiplicative false scaling, and historical telemetry replay.
+A Python reference model is used to generate four-dimensional,
+IEEE~14-bus-derived measurement streams and to evaluate simulated
+abrupt, gradual-ramp and coordinated FDI scenarios. The proposed
+hardware architecture is described in synthesizable SystemVerilog and
+targets the AMD/Xilinx Artix-7 XC7A200T device used by the AC701
+evaluation kit. The arithmetic design uses signed fixed-point
+representation, with Q1.15 parameters reported for the detector
+configuration. The controller coordinates sample capture, statistical
+processing, decision generation and result storage.
 
-Synthesis targeting the AMD/Xilinx Artix-7 AC701 evaluation board (\texttt{xc7a200tfbg676-2}) in Vivado v2026.1 completed with \textbf{0 Errors and 0 Critical Warnings}, utilizing 24 DSP48E1 slices, 2 RAMB18E1 block RAMs, 1,381 Slice LUTs, and 647 Flip-Flops. The canonical Three-Process Moore Finite State Machine (FSM) executes full frame evaluation in 36 clock cycles ($360\text{ ns}$ at $100\text{ MHz}$), yielding a sustained ingestion throughput of $2.77\times 10^6$ frames/second. Statistical performance evaluation demonstrates that while classical $\chi^2$ BDD fails catastrophically on stealth attacks ($35.3\%$ detection rate, $\text{AUC} = 0.59$), the proposed dual-layer engine achieves \textbf{$84.67\%$ Accuracy}, \textbf{$96.36\%$ Precision}, \textbf{$100.0\%$ Stealth Attack Detection}, an \textbf{F1-score of $0.8214$}, an \textbf{$\text{AUC}$ of $0.94$}, and an in-control Average Run Length ($ARL_0$) of $38.1$ frames.
+Two sets of Python results appear in the project records and are kept
+separate in this report because their sample counts differ. An earlier
+1,000-frame run reported 87.70\% accuracy, 97.03\% precision,
+76.22\% recall and an F1-score of 0.8537. A later 1,200-frame result
+reported 84.67\% accuracy, 96.36\% precision, 71.57\% recall and an
+F1-score of 0.8214, with a reported ROC-AUC of 0.94. These runs must
+not be treated as one experiment; the exact evaluation split and
+confusion matrix should be checked against the saved CSV output before
+the final submission. Vivado synthesis was reported to complete with
+zero errors. The latest draft records 647 flip-flops, 24 DSP48E1
+slices and two RAMB18E1 primitives; the LUT count differs between
+available report versions and is therefore identified as requiring
+confirmation from the authoritative utilization report. The reported
+top-level I/O demand also exceeds the stated available bonded I/O.
+Post-implementation timing closure, power estimation and physical
+AC701 board operation are not claimed.
 
-\vspace{0.5cm}
-\noindent\textbf{Keywords:} Smart Grid Cyber-Physical Security, False Data Injection (FDI), State Estimation, Mahalanobis Distance, CUSUM Control Chart, SystemVerilog RTL, Vivado Synthesis, Artix-7 FPGA, Fixed-Point Arithmetic.
+\textbf{Keywords:} Smart Grid Security, False Data Injection,
+Phasor Measurement Unit, Mahalanobis Distance, CUSUM, FPGA,
+SystemVerilog, Fixed-Point Arithmetic.
 
 \tableofcontents
 \listoffigures
 \listoftables
-
 \clearpage
 \pagenumbering{arabic}
 
-% =============================================================================
-% CHAPTER ONE: INTRODUCTION
-% =============================================================================
+% =====================================================================
+% CHAPTER ONE
+% =====================================================================
 \chapter{Introduction}
 
-\section{Background and Motivation}
-Modern electrical smart grids represent critical cyber-physical infrastructures (CPI) that integrate power transmission hardware with wide-area communication networks, computational processors, and Phasor Measurement Units (PMUs). PMUs report GPS-synchronized, high-fidelity voltage and current phasors at rates of $30$ to $60$ samples per second, providing operators with dynamic observability over power flow, voltage stability, and line loading.
+\section{Background of the Study}
+Electrical power systems are increasingly operated as cyber-physical
+systems in which physical infrastructure is monitored and controlled
+through digital communication networks. Smart-grid technologies combine
+measurement devices, communication links, supervisory systems and
+automated control to improve the visibility, reliability and efficiency
+of electricity generation, transmission and distribution.
 
-At the core of the grid control center is the State Estimator (SE). The state estimator processes streaming PMU measurements to filter sensor noise, reconstruct unmeasured line flows, and generate the optimal state vector (bus voltage magnitudes and phase angles). Real-time operational applications, including Optimal Power Flow (OPF), Contingency Analysis (CA), Automatic Generation Control (AGC), and transmission line protective relaying, rely completely on the numerical integrity of this estimated state vector.
+A Phasor Measurement Unit (PMU) measures voltage and current phasors
+using a common time reference. These synchronized measurements provide
+operators and monitoring applications with information about the
+electrical state of a network. PMU measurements can support wide-area
+monitoring, state estimation, disturbance analysis and protection
+applications. Standards such as IEEE C37.118 and its successor
+IEEE/IEC 60255-118-1 specify important aspects of synchrophasor
+measurement and reporting \cite{ieeeC37118,iec60255}.
 
-\section{Problem Statement}
-Despite widespread deployment, centralized state estimators are critically vulnerable to cyber-threats known as False Data Injection (FDI) attacks, first formalized by Liu, Ning, and Reiter \cite{liu2009}. In an FDI attack, an adversary penetrates substation communication channels or remote terminal units (RTUs) and injects maliciously crafted falsified data into the sensor streams.
+The increased use of networked measurement and control also creates
+cybersecurity risks. An attacker who gains access to a measurement
+path may alter, delay, replay or suppress data. A particularly
+important class of attack is the False Data Injection (FDI) attack.
+In an FDI attack, an adversary deliberately changes measurement values
+so that the state estimator or monitoring system receives misleading
+information.
 
-Crucially, if the attacker obtains knowledge of the power grid's physical topology and line admittances, they can construct an attack vector $a = Hc$ that lies directly within the column space of the measurement Jacobian matrix $H$. As proven mathematically in Chapter 3, this subspace attack leaves the classical Weighted Least Squares (WLS) measurement residual vector $r = z - H\hat{x}$ completely unchanged ($r_a = r$). Consequently, conventional Chi-square ($\chi^2$) Bad Data Detection (BDD) routines deployed across control centers fail entirely to trigger an alarm. The falsified states pass unnoticed into grid management algorithms, potentially leading to unauthorized generator re-dispatch, physical line overloading, cascading brownouts, or catastrophic power grid blackouts.
+Traditional bad-data detection techniques commonly examine the
+residual between measured values and values predicted by a state
+estimator. Although effective against many random measurement errors,
+some FDI attacks can be designed to preserve the residual behaviour
+used by conventional detectors. This motivates the use of additional
+statistical information, including relationships among multiple
+measurement channels and the persistence of changes over time.
 
-\section{Research Objectives}
-The primary objective of this project is to design, implement, simulate, synthesize, and benchmark a high-speed FPGA-based PMU edge-monitoring anomaly engine that detects stealthy and non-stealthy False Data Injection attacks by coupling multivariate spatial correlation checks with sequential temporal trend detection.
+This project investigates a detector that combines Mahalanobis
+distance and two-sided CUSUM. Mahalanobis distance measures the
+deviation of a multivariate observation while accounting for
+correlations among features. CUSUM accumulates evidence of persistent
+changes in a monitored statistic. The combined approach is translated
+into a hardware-oriented architecture using SystemVerilog and evaluated
+at the Python-model and FPGA-synthesis stages.
 
-The specific secondary research objectives are:
+\section{Statement of the Problem}
+Power-system state estimation depends on the quality and integrity of
+measurement data. Conventional residual-based bad-data detection
+typically evaluates a residual vector such as
+\begin{equation}
+\boldsymbol r=\boldsymbol z-\boldsymbol H\hat{\boldsymbol x},
+\end{equation}
+where $\boldsymbol z$ is the measurement vector, $\boldsymbol H$ is
+the measurement matrix and $\hat{\boldsymbol x}$ is the estimated
+system state.
+
+For a linear measurement model, an attacker may construct an attack
+vector of the form
+\begin{equation}
+\boldsymbol a=\boldsymbol H\boldsymbol c,
+\end{equation}
+where $\boldsymbol c$ is a selected state perturbation. Under the
+ideal assumptions of the linear model and estimator, the attacked
+measurement vector can produce the same residual as the unattacked
+measurement vector. This is the central reason that a residual-only
+detector cannot be assumed to identify every carefully designed
+stealth FDI attack \cite{liu2009,liu2011}.
+
+The engineering problem addressed in this project is therefore the
+design of an additional statistical monitoring mechanism that examines
+multivariate measurement behaviour and temporal persistence. The
+detector must also be expressed in a hardware-oriented form that can
+be synthesized for an FPGA. The implementation must balance numerical
+range, arithmetic precision, resource use and the interface requirements
+of the target device.
+
+\section{Aim of the Project}
+The aim of this project is to design and evaluate a hardware-oriented
+statistical anomaly-detection engine for smart-grid measurement streams,
+combining Mahalanobis-distance analysis and two-sided CUSUM detection
+for the identification of simulated FDI activity.
+
+\section{Specific Objectives}
+The specific objectives are to:
 \begin{enumerate}
-    \item \textbf{Mathematical Power System Modeling:} Formulate the DC state estimation model for an IEEE 14-bus transmission corridor (Branch 1--2), synthesize four distinct cyber-attack profiles (Stealth Subspace, Linear Ramp/Drift, Multiplicative Scaling, and Historical Replay), and mathematically prove the blindness of classical $\chi^2$ residual testing.
-    \item \textbf{Dual-Layer Statistical Detector Formulation:} Combine squared Mahalanobis Distance ($D^2 = r^T \Sigma^{-1} r$) for spatial inter-channel correlation monitoring with two-sided recursive Cumulative Sum (CUSUM, $S^+, S^-$) control charts for temporal drift accumulation.
-    \item \textbf{Fixed-Point Precision Datapath Design:} Implement the entire mathematical detection datapath in signed Q1.15 fixed-point arithmetic using SystemVerilog, incorporating rounding offsets ($+0\text{x}4000$) and corner-case overflow saturation clamps.
-    \item \textbf{Three-Process Moore Controller Architecture:} Engineer an IEEE 1800-compliant Moore Finite State Machine (FSM) that autonomously sequences sample latching, mean-centering preprocessing, folded matrix-vector multiplication, CUSUM calculation, and Block RAM state restoration.
-    \item \textbf{FPGA Hardware Synthesis on AC701:} Synthesize the complete engine targeting the AMD/Xilinx Artix-7 XC7A200T FPGA (\texttt{xc7a200tfbg676-2}), extracting physical DSP48E1 slices, RAMB18E1 block RAMs, Slice LUTs, register flip-flops, and static timing constraints.
-    \item \textbf{Empirical Verification and Benchmark Comparison:} Verify the SystemVerilog hardware netlist against a bit-accurate Python golden model using $1,200$ telemetry frames, exporting standardized CSV data (`t, y0..y3, D2, S_t, alarm, label`), and plotting ROC curves, ARL trade-offs, detection delay curves, and head-to-head comparisons against conventional BDD.
+    \item Develop a Python reference model that generates
+    IEEE~14-bus-derived measurement streams and simulates abrupt,
+    gradual-ramp and coordinated FDI scenarios.
+    \item Develop a multivariate statistical detector based on
+    Mahalanobis distance and a sequential detector based on two-sided
+    CUSUM.
+    \item Define a fixed-point representation and translate the
+    statistical datapath into synthesizable SystemVerilog.
+    \item Implement a finite-state-machine controller for coordinating
+    sample capture, feature processing, anomaly decisions and result
+    storage.
+    \item Synthesize the RTL for the Artix-7 XC7A200T target using
+    Vivado and examine the reported resource utilization and design
+    warnings.
+    \item Identify the additional verification, timing, interface and
+    physical implementation work required before the design can be
+    considered ready for board-level deployment.
 \end{enumerate}
 
-\section{Specific Contributions}
-The key contributions of this course project are:
-\begin{itemize}
-    \item \textbf{Provably Resilient Dual-Layer Architecture:} We demonstrate that while linear DC state estimation fails to detect $a = Hc$ attacks ($35.3\%$ detection rate), an empirical inverse covariance matrix $\Sigma^{-1}$ derived from full AC power-flow physics catches subspace attacks instantaneously ($100.0\%$ detection, $0\text{ ms}$ latency).
-    \item \textbf{Hardware-Optimized Q1.15 Math:} We eliminate expensive hardware matrix inversion and square roots by computing the squared distance $D^2$ against a squared threshold $T^2$, achieving bit-accurate hardware-software agreement ($\le 1\text{ LSB}$ error across $1,200$ samples).
-    \item \textbf{Verified AC701 FPGA Implementation:} Complete synthesis was validated in AMD Vivado v2026.1 with \textbf{0 Errors and 0 Critical Warnings}, utilizing only $24$ DSP48E1 slices ($3.2\%$ of device) and $2$ RAMB18E1 blocks, achieving a stream ingestion throughput of $2.77\text{ MSamples/sec}$.
-    \item \textbf{Reproducible Open Verification Suite:} The complete pipeline, including SystemVerilog RTL, standalone testbenches, Python golden models, IEEE 14-bus CSV streams, and 9 publication-grade analytical plotting scripts, is published openly on GitHub.
-\end{itemize}
+\section{Significance of the Project}
+The project demonstrates the translation of statistical cybersecurity
+algorithms into a digital hardware architecture. It brings together
+power-system measurement concepts, anomaly detection, fixed-point
+arithmetic, finite-state-machine design and FPGA synthesis.
 
-\section{Report Organization}
-The remainder of this report is organized as follows: Chapter 2 reviews the related literature and establishes the research gap. Chapter 3 outlines preliminaries, threat assumptions, and the formal notation table. Chapter 4 provides detailed mathematical derivations, algorithm update equations, and fixed-point error analysis. Chapter 5 details the synthesizable SystemVerilog hardware architecture and FSM control flow. Chapter 6 describes the experimental implementation setup. Chapter 7 presents empirical verification results, plotted CSV curves, and Vivado synthesis metrics. Chapter 8 discusses trade-offs, ablation results, and threats to validity. Chapter 9 concludes the report and suggests directions for future work.
+The project is also useful as an engineering study of the difference
+between an algorithmic result and a hardware implementation result.
+A Python detector can demonstrate statistical behaviour, while RTL
+synthesis can demonstrate that a hardware description can be mapped
+to FPGA resources. Neither result alone proves that the physical
+hardware operates correctly at a specified clock rate. Separating
+these levels of evidence is important for reproducible engineering.
 
-% =============================================================================
-% CHAPTER TWO: LITERATURE REVIEW
-% =============================================================================
+\section{Scope of the Project}
+The project focuses on a four-feature measurement prototype derived
+from an IEEE~14-bus power-system model. The selected features are
+identified in the implementation records as $V_1$, $V_2$, $P_{12}$
+and $Q_{12}$. The Python model generates normal and attacked
+measurement sequences and evaluates the statistical detector.
+
+The hardware work focuses on the SystemVerilog description of the
+Mahalanobis and CUSUM processing architecture, its controller and
+associated state storage. The target device is the Artix-7
+XC7A200T-FBG676-2 associated with the AC701 evaluation platform.
+
+The scope includes Python-based evaluation and Vivado synthesis.
+It does not claim completed post-route timing closure, power
+measurement or physical board-level operation. The reported I/O
+over-utilization and missing timing constraints are treated as
+implementation limitations.
+
+\section{Organisation of the Report}
+Chapter One introduces the project, its motivation, aim, objectives
+and scope. Chapter Two reviews relevant work on smart-grid
+cybersecurity, FDI attacks, state estimation, Mahalanobis distance,
+CUSUM and FPGA implementation. Chapter Three presents the mathematical
+model and fixed-point considerations. Chapter Four describes the
+Python methodology, hardware architecture and circuit-level design.
+Chapter Five presents the available software and synthesis results
+and discusses their limitations. Chapter Six concludes the report and
+gives recommendations for further development.
+
+% =====================================================================
+% CHAPTER TWO
+% =====================================================================
 \chapter{Literature Review}
 
 \section{Introduction}
-This chapter surveys foundational and contemporary literature spanning smart grid state estimation, cyber-security vulnerabilities, statistical anomaly detection, and FPGA-based cryptographic and cyber-physical monitoring engines.
+This chapter reviews the concepts that inform the design of the
+proposed detector. The discussion covers smart-grid cybersecurity,
+FDI attacks, conventional bad-data detection, multivariate statistical
+monitoring, sequential change detection and FPGA-based implementation.
+The objective is to establish the technical basis for combining
+Mahalanobis distance and CUSUM in a fixed-point hardware architecture.
 
-\section{Foundations of Power System State Estimation}
-Power system state estimation was pioneered by Schweppe et al. \cite{schweppe1970} to filter measurement noise from supervisory control and data acquisition (SCADA) systems. Abur and Exp\'{o}sito \cite{abur2004} formalized Weighted Least Squares (WLS) state estimation and Chi-square ($\chi^2$) residual testing. The emergence of high-speed Phasor Measurement Units (PMUs) governed by IEEE Standard C37.118 \cite{ieee_c37118} enabled synchronized linear state estimation, but simultaneously exposed grid telemetry to network-based cyber-intrusions.
+\section{Smart-Grid Cybersecurity}
+A smart grid combines electrical equipment with sensing, communication
+and computational technologies. This creates a more observable and
+controllable power network, but also introduces digital interfaces
+that may be exposed to cyber threats. Cybersecurity therefore has to
+consider the confidentiality, integrity and availability of data and
+control functions.
 
-\section{False Data Injection (FDI) Attacks on State Estimators}
-The vulnerability of state estimation to unobservable stealth attacks was first demonstrated by Liu, Ning, and Reiter \cite{liu2009}. They proved that an attacker possessing local line admittances can inject an error $a = Hc$ that guarantees zero residual distortion. Liang et al. \cite{liang2017} extended FDI attacks to dynamic state estimators, showing that time-correlated injections can bypass Kalman filter innovations. Rahman and Mohsenian-Rad \cite{rahman2012} demonstrated that false data attacks can maliciously manipulate locational marginal prices (LMP) in competitive electricity markets, yielding millions of dollars in financial theft.
+NIST's smart-grid cybersecurity guidance describes the need for
+security architectures and risk management across smart-grid
+components \cite{nist7628,nist7628r1}. The security of measurement
+data is particularly important because control-room applications
+may use these measurements to estimate system state and support
+operational decisions.
 
-\section{Multivariate Statistical and Anomaly Detection}
-To detect subspace anomalies, researchers turned to multivariate statistical distributions. Mahalanobis \cite{mahalanobis1936} formulated the generalized distance metric $D^2 = (x - \mu)^T \Sigma^{-1} (x - \mu)$, which weights spatial deviations by inter-variable covariance. In power systems, Huang et al. \cite{huang2019} applied spatial correlation metrics to identify tampered PMU packets. However, spatial distance alone cannot detect slow, continuous measurement drifts that remain below static alarm thresholds.
+The project concentrates on measurement integrity. It does not
+implement a complete smart-grid security architecture, intrusion
+prevention system or communication-security protocol. Instead, it
+examines how statistical monitoring can identify abnormal patterns
+in a measurement stream.
 
-\section{Sequential Change-Point Detection (CUSUM)}
-Sequential analysis, founded by Page \cite{page1954}, tracks cumulative deviations over time. The Cumulative Sum (CUSUM) control chart accumulates positive and negative residuals ($S^+, S^-$) to detect parameter shifts faster than any fixed-sample test, as formalized by Lorden \cite{lorden1971} and Moustakides \cite{moustakides1986}. In power networks, Gu et al. \cite{gu2017} proposed CUSUM filtering to track subtle voltage drifts, but their implementation was confined to floating-point software simulations on offline CPUs.
+\section{False Data Injection Attacks}
+FDI attacks involve the deliberate manipulation of measurements
+supplied to a state estimator. Liu, Ning and Reiter demonstrated
+that an attacker with suitable knowledge of the measurement model
+may construct measurement changes that evade conventional
+residual-based bad-data detection \cite{liu2009,liu2011}.
 
-\section{Hardware Acceleration and FPGA Implementations}
-Implementing statistical anomaly detection directly at the PMU edge requires dedicated digital logic. Several works have investigated hardware accelerators for smart grid protection. Table \ref{tab:lit_comparison} compares five prominent published architectures against our proposed design.
+For a linear model, the measurement vector is
+\begin{equation}
+\boldsymbol z=\boldsymbol H\boldsymbol x+\boldsymbol e.
+\end{equation}
+An attacked measurement vector can be written as
+\begin{equation}
+\boldsymbol z_a=\boldsymbol z+\boldsymbol a.
+\end{equation}
+If the attack vector is selected as
+\begin{equation}
+\boldsymbol a=\boldsymbol H\boldsymbol c,
+\end{equation}
+then, under the ideal model assumptions, the attack can be absorbed
+into a shifted state estimate. This illustrates why a detector that
+only examines the conventional estimator residual may not be
+sufficient against all attack constructions.
 
-\begin{table}[htbp]
+FDI attacks may be grouped by their temporal behaviour. Abrupt attacks
+introduce a sudden change in one or more measurements. Ramp attacks
+introduce a gradual drift over multiple samples. Coordinated attacks
+modify multiple measurements according to a structured relationship.
+The project uses simulated versions of these broad categories to
+exercise the detector.
+
+\section{Conventional Bad-Data Detection}
+Conventional power-system state estimation commonly uses weighted
+least squares (WLS). A residual-based detector evaluates the
+difference between the measurement vector and the estimated
+measurement vector. A common global statistic is
+\begin{equation}
+J=\boldsymbol r^T\boldsymbol R^{-1}\boldsymbol r,
+\end{equation}
+where $\boldsymbol R$ is the measurement-noise covariance matrix.
+Under suitable assumptions, the statistic can be compared with a
+chi-square threshold whose degrees of freedom depend on the
+measurement and state dimensions \cite{abur2004}.
+
+Residual-based methods are useful for detecting measurement errors
+that are inconsistent with the assumed measurement model. Their
+limitations become important when an attacker deliberately constructs
+a measurement vector that preserves the residual properties. The
+proposed project therefore treats residual analysis as a useful
+reference concept rather than assuming that it detects every FDI
+scenario.
+
+\section{Mahalanobis Distance}
+Mahalanobis distance is a multivariate measure of the distance between
+an observation and a reference distribution. Unlike ordinary
+Euclidean distance, it accounts for scale and correlation among
+features. For a feature vector $\boldsymbol q$, reference mean
+$\boldsymbol\mu$ and covariance matrix $\boldsymbol\Sigma$, the
+squared distance is
+\begin{equation}
+D^2=(\boldsymbol q-\boldsymbol\mu)^T
+\boldsymbol\Sigma^{-1}(\boldsymbol q-\boldsymbol\mu).
+\end{equation}
+The inverse covariance matrix is commonly called the precision
+matrix. Mahalanobis introduced the generalised distance in the
+context of statistical measurement \cite{mahalanobis1936}.
+
+For this project, the feature vector is centred and scaled before
+the distance calculation. This is important because the four
+measurement channels may have different physical units and ranges.
+A detector that directly combines voltage, active-power and
+reactive-power values without suitable scaling may be dominated
+by whichever feature has the largest numerical magnitude.
+
+Mahalanobis distance is a statistical anomaly score. It should not
+be interpreted as a universal FDI detector: its effectiveness depends
+on the reference data, feature selection, covariance estimate,
+normalisation and attack construction. In particular, a
+feature-space anomaly detector is not mathematically identical to
+a WLS residual detector.
+
+\section{CUSUM Detection}
+CUSUM is a sequential statistical process-monitoring technique.
+Rather than making a decision from one sample alone, it accumulates
+evidence of a persistent shift. Page's continuous inspection scheme
+is a foundational reference for this approach \cite{page1954}.
+
+A two-sided CUSUM maintains positive and negative statistics. The
+positive statistic responds to upward shifts, while the negative
+statistic responds to downward shifts. The reference allowance
+controls the amount of deviation accumulated at each step, while
+the decision threshold determines when an alarm is generated.
+
+CUSUM is useful for gradual changes that may not exceed a static
+threshold immediately. However, the choice of reference allowance
+and decision threshold affects both false alarms and detection
+delay. The Average Run Length (ARL) is commonly used to describe
+the expected number of observations before an alarm under a
+specified operating condition.
+
+Huang \textit{et al.} studied an adaptive CUSUM method for
+false-data-injection detection in smart-grid networks, providing
+a directly relevant example of sequential monitoring for this
+application \cite{huang2016}.
+
+\section{Combining Spatial and Temporal Detection}
+Mahalanobis distance and CUSUM examine different aspects of
+measurement behaviour. Mahalanobis distance evaluates a
+multivariate observation relative to a reference distribution.
+CUSUM evaluates whether a monitored statistic exhibits a persistent
+shift over time.
+
+A combined detector can therefore use a spatial anomaly score
+and a temporal change statistic. This does not guarantee detection
+of every stealthy attack. Rather, it provides two complementary
+tests whose performance must be measured against clearly defined
+attack scenarios and reference data.
+
+The design in this project uses a Mahalanobis-distance engine and
+a two-sided CUSUM filter. The exact signal passed to the CUSUM
+block must be defined consistently in the software and RTL
+implementation. In this report, $y_n$ denotes the normalised
+scalar statistic supplied to CUSUM; it is not assumed to be an
+unscaled physical voltage or power measurement.
+
+\section{FPGA-Based Statistical Processing}
+FPGAs contain configurable logic, registers, memory blocks and
+dedicated arithmetic resources. These resources can be arranged
+to implement parallel or time-multiplexed arithmetic pipelines.
+For streaming applications, an FPGA can provide predictable
+processing latency when the design is correctly constrained,
+implemented and verified.
+
+The Artix-7 family includes configurable logic blocks, DSP slices
+and block RAM resources. The actual resources and I/O capability
+available to a design depend on the selected device and package
+\cite{artix7ds}. Vivado synthesis estimates how RTL maps to
+resources, while timing analysis after implementation is needed
+to account for routed paths and physical effects \cite{ug901,ug903}.
+
+This project uses Vivado to synthesize the SystemVerilog design
+for the XC7A200T target. The available results are treated as
+synthesis evidence only. Since the available project records
+indicate missing timing constraints and an I/O over-utilization
+condition, no post-route timing or physical-performance claim
+is made.
+
+\section{Power-System Test Cases and Simulation}
+The IEEE~14-bus test system is a commonly used benchmark for
+power-system analysis. MATPOWER provides standard case data and
+power-flow tools that support reproducible power-system studies
+\cite{zimmerman2011,matpowercase14}. The use of an IEEE~14-bus-derived
+model provides a structured basis for generating measurement
+scenarios, but synthetic benchmark data should not be confused
+with field measurements from an operating utility network.
+
+\section{Research Gap and Project Position}
+The reviewed work establishes the importance of FDI attacks,
+the limitations of residual-only detection for certain attack
+constructions, and the value of multivariate and sequential
+statistical monitoring. This project focuses on translating a
+combined Mahalanobis-distance and two-sided CUSUM detector into
+a fixed-point SystemVerilog architecture for an Artix-7 target.
+
+The contribution is a prototype implementation and evaluation
+workflow, not a claim that the architecture solves all smart-grid
+FDI attacks. Its performance is bounded by the selected features,
+synthetic attack scenarios, calibration data, numerical format
+and the current hardware verification stage.
+
+\section{Comparison with Selected Prior Work}
+Table~\ref{tab:priorwork} summarises selected foundational and
+directly relevant work. The table deliberately distinguishes
+power-system tools and theoretical methods from implemented
+hardware detectors.
+
+\begin{table}[H]
 \centering
+\caption{Selected related work and the position of this project.}
+\label{tab:priorwork}
 \small
-\caption{Comparison of Prior Published Works vs. Proposed Group 9 FPGA Engine}
-\label{tab:lit_comparison}
-\begin{tabular}{p{2.8cm}cp{2.4cm}p{2.0cm}p{2.2cm}p{3.2cm}}
+\begin{tabular}{p{2.4cm}p{1.0cm}p{3.2cm}p{2.4cm}p{3.0cm}}
 \toprule
-\textbf{Reference} & \textbf{Year} & \textbf{Platform} & \textbf{Algorithm} & \textbf{Latency / Speed} & \textbf{Limitation Addressed} \\
+Work & Year & Main contribution & Platform / context & Relevance and limitation \\
 \midrule
-Liu et al. \cite{liu2009} & 2011 & Offline CPU (MATLAB) & Classical $\chi^2$ Residual BDD & High ($>100\text{ ms}$) & Completely blind to stealth attacks ($a=Hc$). \\
-\addlinespace
-Kurt et al. \cite{kurt2019} & 2019 & Python / CPU & CUSUM on Kalman residual & $12\text{ ms}$ & Evaluated only on floating-point; no hardware RTL. \\
-\addlinespace
-Khan et al. \cite{khan2021} & 2021 & Xilinx Virtex-7 & Hardware SVM Classifier & $1.8\text{ }\mu\text{s}$ ($550\text{ kHz}$) & Heavy DSP footprint ($>80$ DSPs); ignores temporal drift. \\
-\addlinespace
-Al-Abassi et al. \cite{alabassi2022} & 2022 & Zynq-7000 SoC & Deep Learning Autoencoder & $85\text{ }\mu\text{s}$ & High resource utilization ($>8\text{k}$ LUTs); non-deterministic latency. \\
-\addlinespace
-Chen et al. \cite{chen2023} & 2023 & Kintex-7 FPGA & Static Mahalanobis Distance & $0.45\text{ }\mu\text{s}$ & Missing temporal CUSUM; blind to gradual ramp/drift attacks. \\
-\addlinespace
-\textbf{Proposed Work (Group 09)} & \textbf{2026} & \textbf{Artix-7 AC701 (\texttt{xc7a200t})} & \textbf{Dual-Layer: Mahalanobis + CUSUM} & \textbf{$360\text{ ns}$ ($2.77\text{ MSps}$)} & \textbf{Solves both subspace stealth and slow drift; 24 DSPs, bit-accurate Q1.15.} \\
+Mahalanobis \cite{mahalanobis1936} & 1936 &
+Generalised multivariate distance &
+Statistical method &
+Provides the mathematical basis for covariance-aware distance. \\
+
+Page \cite{page1954} & 1954 &
+Sequential inspection / CUSUM &
+Statistical process monitoring &
+Provides the basis for accumulating evidence of persistent shifts. \\
+
+Abur and Exposito \cite{abur2004} & 2004 &
+Power-system state estimation &
+Power-system analysis &
+Provides WLS estimation and residual-based bad-data concepts. \\
+
+Liu \textit{et al.} \cite{liu2009,liu2011} & 2009/2011 &
+Stealth FDI attack construction &
+Power-grid state estimation &
+Explains why certain attacks can evade residual-based detection. \\
+
+Zimmerman \textit{et al.} \cite{zimmerman2011} & 2011 &
+MATPOWER power-system analysis tools &
+Software benchmark tools &
+Provides a reproducible power-system modelling environment; not an FDI hardware detector. \\
+
+Huang \textit{et al.} \cite{huang2016} & 2016 &
+Adaptive CUSUM for FDI detection &
+Smart-grid network monitoring &
+Directly relevant to sequential FDI detection; does not establish the present FPGA implementation. \\
+
+NIST \cite{nist7628,nist7628r1} & 2010/2014 &
+Smart-grid cybersecurity guidance &
+Cybersecurity framework &
+Provides security context rather than a detector datapath. \\
+
+This work & 2026 &
+Mahalanobis plus two-sided CUSUM, fixed-point RTL &
+Artix-7 XC7A200T synthesis target &
+Combines spatial and temporal statistics; hardware timing and board validation remain incomplete. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Research Gap}
-As evidenced by Table \ref{tab:lit_comparison}, prior literature exhibits three primary deficiencies:
-\begin{enumerate}
-    \item \textbf{Single-Layer Vulnerability:} Existing detectors implement either spatial correlation (missing slow drifts) or temporal CUSUM alone (exhibiting detection latency on abrupt attacks).
-    \item \textbf{Software Bottlenecks:} Most proposed FDI countermeasures rely on complex matrix inversions or neural networks evaluated on high-latency CPUs, making them incapable of line-rate streaming at PMU reporting frequencies.
-    \item \textbf{Lack of Fixed-Point Hardware Verification:} Algorithms are rarely translated into synthesizable fixed-point RTL with rigorous timing closure and verifiable Block RAM state preservation.
-\end{enumerate}
-This project bridges this gap by delivering a unified, dual-layer SystemVerilog architecture that achieves line-rate throughput on an AMD/Xilinx Artix-7 FPGA with zero numerical overflow.
+% =====================================================================
+% CHAPTER THREE
+% =====================================================================
+\chapter{Mathematical Formulation and Fixed-Point Design}
 
-% =============================================================================
-% CHAPTER THREE: PRELIMINARIES AND PROBLEM FORMULATION
-% =============================================================================
-\chapter{Preliminaries, Threat Model and Problem Formulation}
-
-\section{Notation Table}
-To maintain mathematical consistency throughout this report, all variables, dimensions, word formats, and physical units are formally defined in Table \ref{tab:notation}.
-
-\begin{table}[htbp]
-\centering
-\small
-\caption{Mathematical Notation, Signal Formats and System Dimensions}
-\label{tab:notation}
-\begin{tabular}{llll}
-\toprule
-\textbf{Symbol} & \textbf{Description} & \textbf{Word Length / Format} & \textbf{Physical Units} \\
-\midrule
-$N$ & Number of PMU measurement channels & Scalar integer ($N=4$) & Dimensionless \\
-$m$ & Total physical measurement observations & Scalar integer ($m=4$) & Dimensionless \\
-$n$ & System state variables (voltage angles) & Scalar integer ($n=1$) & Dimensionless \\
-$z \in \mathbb{R}^m$ & Raw physical measurement vector & 4-element real vector & p.u. (kV, MW, MVAR) \\
-$x \in \mathbb{R}^n$ & Power system state vector ($\theta_2$) & 1-element real vector & Radians (rad) \\
-$H \in \mathbb{R}^{m \times n}$ & Measurement Jacobian matrix & $4 \times 1$ real matrix & p.u. / rad \\
-$R \in \mathbb{R}^{m \times m}$ & Measurement noise covariance matrix & $4 \times 4$ diagonal matrix & $\text{p.u.}^2$ \\
-$\hat{x}$ & WLS estimated state vector & 1-element real vector & Radians (rad) \\
-$r \in \mathbb{R}^m$ & Measurement residual vector ($z - H\hat{x}$) & 4-element real vector & p.u. \\
-$J$ & Normalized Chi-square residual cost & Scalar real & Dimensionless ($\sim \chi^2_3$) \\
-$a \in \mathbb{R}^m$ & Injected cyber-attack vector & 4-element real vector & p.u. \\
-$c \in \mathbb{R}^n$ & False state deviation injected by attacker & Scalar real & Radians (rad) \\
-$\mu \in \mathbb{R}^N$ & Nominal baseline mean vector & Q1.15 signed (16 bits) & Normalized $[-1, 1)$ \\
-$\Sigma \in \mathbb{R}^{N \times N}$ & Telemetry covariance matrix & $4 \times 4$ real matrix & Normalized variance \\
-$W = \Sigma^{-1}$ & Hardware precision matrix & Q1.15 signed ($4 \times 4$) & Fixed-point LSBs \\
-$D^2$ & Squared Mahalanobis distance metric & Q1.15 signed (16 bits) & Fixed-point LSBs \\
-$T^2$ & Spatial anomaly threshold & Q1.15 signed (16 bits) & $2,600\text{ LSBs}$ ($0\text{x}0\text{A}28$) \\
-$S_t^+, S_t^-$ & Two-sided CUSUM accumulators & Q1.15 signed (16 bits) & Non-negative LSBs \\
-$k$ & CUSUM reference slack parameter & Q1.15 signed (16 bits) & $6,500\text{ LSBs}$ ($0\text{x}1964$) \\
-$h$ & CUSUM decision threshold & Q1.15 signed (16 bits) & $22,000\text{ LSBs}$ ($0\text{x}55\text{F}0$) \\
-$\nu_0$ & Nominal CUSUM residual mean & Q1.15 signed (16 bits) & $0\text{x}0000$ ($0.0$) \\
-$\tau$ & Detection latency & Integer & Clock cycles / ms \\
-$ARL_0, ARL_1$ & Average Run Lengths (In/Out-of-control) & Integer & PMU Frames \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section{Power Grid Network Model (IEEE 14-Bus Branch 1--2)}
-We model the critical transmission link between **Bus 1** (Slack bus: $V_1 = 1.060\text{ p.u.}$, $\theta_1 = 0^\circ$) and **Bus 2** (Generator PV bus: $V_2 = 1.045\text{ p.u.}$, $\theta_2 = -5.32^\circ \approx -0.0929\text{ rad}$) of the standard IEEE 14-bus benchmark test feeder \cite{zimmerman2011}.
-
-The Branch 1--2 line electrical parameters are:
+\section{System Model and Notation}
+The linearised measurement model is
 \begin{equation}
-R_{12} = 0.01938\text{ p.u.}, \quad X_{12} = 0.05917\text{ p.u.}, \quad B_{c,12}/2 = 0.0264\text{ p.u.}
+\boldsymbol z=\boldsymbol H\boldsymbol x+\boldsymbol e,
+\label{eq:measurement}
 \end{equation}
-Under DC power flow assumptions, line series reactance dominates:
-\begin{equation}
-B_{12} = \frac{1}{X_{12}} = \frac{1}{0.05917} = 16.90\text{ p.u.}
-\end{equation}
-The four measured physical channels comprising the telemetry vector $z$ are:
-\begin{equation}
-z = \begin{bmatrix} z_0 \\ z_1 \\ z_2 \\ z_3 \end{bmatrix} = \begin{bmatrix} P_{12} \text{ (Active power flow Bus 1}\to\text{2)} \\ P_1 \text{ (Active power injection Bus 1)} \\ P_2 \text{ (Active power injection Bus 2)} \\ V_2 \text{ (Voltage magnitude Bus 2)} \end{bmatrix}
-\end{equation}
-
-The DC measurement Jacobian matrix $H \in \mathbb{R}^{4 \times 1}$ relating $z$ to state $x = [\theta_2]$ is:
-\begin{equation}
-H = \begin{bmatrix} -B_{12} \\ -B_{12} \\ B_{12} \\ 0.00 \end{bmatrix} = \begin{bmatrix} -16.90 \\ -16.90 \\ 16.90 \\ 0.00 \end{bmatrix}
-\end{equation}
-Sensor noise covariance is $R = \text{diag}(\sigma_0^2, \sigma_1^2, \sigma_2^2, \sigma_3^2)$ where $\sigma_{P} = 0.020\text{ p.u.}$ ($2\%$) and $\sigma_{V} = 0.005\text{ p.u.}$ ($0.5\%$).
-
-\section{Adversarial Threat Model}
-Following the established threat taxonomy of Liu et al. \cite{liu2009}, we assume the attacker has achieved localized network intrusion into substation telemetry communication channels. The attacker:
+where:
 \begin{itemize}
-    \item Possesses knowledge of the local topology matrix $H$.
-    \item Can modify measurements $z$ by adding an attack vector: $z_a = z + a$.
-    \item Aims to manipulate the estimated state $\hat{x}_a = \hat{x} + c$ by state offset $c \neq 0$ without triggering BDD alarms.
+    \item $\boldsymbol z\in\mathbb R^m$ is the measurement vector;
+    \item $\boldsymbol H\in\mathbb R^{m\times n}$ is the measurement matrix;
+    \item $\boldsymbol x\in\mathbb R^n$ is the system-state vector;
+    \item $\boldsymbol e\in\mathbb R^m$ is the measurement-noise vector.
 \end{itemize}
+A common noise assumption is
+\begin{equation}
+\boldsymbol e\sim\mathcal N(\boldsymbol 0,\boldsymbol R),
+\end{equation}
+where $\boldsymbol R$ is the measurement-noise covariance matrix.
 
-% =============================================================================
-% CHAPTER FOUR: MATHEMATICAL MODELING AND DERIVATIONS
-% =============================================================================
-\chapter{Mathematical Modeling and Fixed-Point Analysis}
+The project detector operates on a four-dimensional feature vector.
+For clarity, the symbol $\boldsymbol q_n$ is used for the feature
+vector at sample $n$. The vector may be formed from selected
+voltage and power measurements after preprocessing and normalisation.
 
-\section{Weighted Least Squares (WLS) State Estimation}
-Given the linear measurement model:
+\begin{table}[H]
+\centering
+\caption{Principal mathematical notation.}
+\label{tab:notation}
+\begin{tabular}{p{2.4cm}p{8.6cm}p{2.0cm}}
+\toprule
+Symbol & Meaning & Format / unit \\
+\midrule
+$\boldsymbol z$ & Power-system measurement vector & Physical units \\
+$\boldsymbol H$ & Measurement matrix & Model-dependent \\
+$\boldsymbol x$ & System-state vector & Model-dependent \\
+$\boldsymbol e$ & Measurement noise & Model-dependent \\
+$\boldsymbol r$ & State-estimation residual & Physical units \\
+$\boldsymbol q_n$ & Normalised four-feature input & Scaled values \\
+$\boldsymbol\mu$ & Reference feature mean & Scaled values \\
+$\boldsymbol\Sigma$ & Feature covariance matrix & Scaled values$^2$ \\
+$\boldsymbol W$ & Precision matrix, $\boldsymbol\Sigma^{-1}$ & Quantised coefficients \\
+$D_n^2$ & Squared Mahalanobis score & Scaled score \\
+$S_n^+,S_n^-$ & Positive and negative CUSUM states & Fixed point \\
+$k$ & CUSUM reference allowance & Q1.15 parameter \\
+$h$ & CUSUM alarm threshold & Q1.15 parameter \\
+$\nu_0$ & CUSUM reference mean & Q1.15 parameter \\
+$\tau^2$ & Mahalanobis alarm threshold & Q1.15 parameter \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{False Data Injection Model}
+An attacked measurement vector is
 \begin{equation}
-z = Hx + e, \quad e \sim \mathcal{N}(0, R)
-\label{eq:dc_model}
+\boldsymbol z_a=\boldsymbol z+\boldsymbol a,
+\label{eq:attackedmeasurement}
 \end{equation}
-The WLS state estimator solves the weighted minimization problem:
+where $\boldsymbol a$ is the injected attack vector.
+
+A commonly studied stealthy attack construction is
 \begin{equation}
-\min_x J(x) = (z - Hx)^T R^{-1} (z - Hx)
+\boldsymbol a=\boldsymbol H\boldsymbol c,
+\label{eq:stealthattack}
 \end{equation}
-Setting the gradient with respect to $x$ to zero:
+where $\boldsymbol c$ is an attacker-selected state perturbation.
+Under the ideal linear model, if the estimator absorbs this change
+into its state estimate, the residual may remain unchanged. This
+is why residual-only bad-data detection cannot be assumed to detect
+every attack in this class.
+
+The project also evaluates attacks that alter the selected feature
+stream directly. Such feature-space anomalies may be detected when
+they cause a sufficiently large departure from the calibrated
+multivariate distribution or a persistent change in the monitored
+statistic. Detection performance therefore depends on the relationship
+between the simulated attack construction and the features supplied
+to the detector.
+
+\section{Weighted Least-Squares State Estimation}
+For a linear measurement model, the weighted least-squares estimate
+is
 \begin{equation}
-\frac{\partial J}{\partial x} = -2 H^T R^{-1} (z - Hx) = 0 \implies H^T R^{-1} H x = H^T R^{-1} z
+\hat{\boldsymbol x}=
+(\boldsymbol H^T\boldsymbol R^{-1}\boldsymbol H)^{-1}
+\boldsymbol H^T\boldsymbol R^{-1}\boldsymbol z.
+\label{eq:wls}
 \end{equation}
-Assuming full column rank for $H$, the unique WLS estimate is:
+The residual vector is
 \begin{equation}
-\hat{x} = \left( H^T R^{-1} H \right)^{-1} H^T R^{-1} z = K_{\text{WLS}} z
-\label{eq:wls_sol}
-\end{equation}
-The measurement residual vector $r$ is:
-\begin{equation}
-r = z - H \hat{x} = \left( I - H K_{\text{WLS}} \right) z = S z
+\boldsymbol r=\boldsymbol z-\boldsymbol H\hat{\boldsymbol x}.
 \label{eq:residual}
 \end{equation}
-where $S = I - H(H^T R^{-1} H)^{-1} H^T R^{-1}$ is the residual projection matrix. Since $SH = (I - H(H^T R^{-1} H)^{-1} H^T R^{-1})H = H - H = 0$, the residual of clean measurements has zero mean: $\mathbb{E}[r] = S \mathbb{E}[z] = S H x = 0$.
-
-\section{Mathematical Proof: Blindness of Chi-Square BDD to Stealth FDI}
-\noindent\textbf{Theorem 1 (Liu, Ning \& Reiter, 2009 \cite{liu2009}):} \textit{An attack vector $a = Hc$ injected into measurement vector $z$ produces an identical measurement residual to that of the uncorrupted system.}
-
-\noindent\textbf{Proof:} Let the corrupted measurement vector be $z_a = z + a = z + Hc$. Substituting $z_a$ into the WLS estimator equation (\ref{eq:wls_sol}):
-\begin{align}
-\hat{x}_a &= \left( H^T R^{-1} H \right)^{-1} H^T R^{-1} (z + Hc) \nonumber \\
-&= \left( H^T R^{-1} H \right)^{-1} H^T R^{-1} z + \left( H^T R^{-1} H \right)^{-1} H^T R^{-1} H c \nonumber \\
-&= \hat{x} + I \cdot c = \hat{x} + c
-\end{align}
-Now, computing the post-attack residual vector $r_a$:
-\begin{align}
-r_a &= z_a - H \hat{x}_a = (z + Hc) - H(\hat{x} + c) \nonumber \\
-&= z + Hc - H\hat{x} - Hc \nonumber \\
-&= z - H\hat{x} = r
-\end{align}
-Evaluating the Chi-square test statistic $J_a$:
+A common global residual statistic is
 \begin{equation}
-J_a = r_a^T R^{-1} r_a = r^T R^{-1} r = J \sim \chi^2_{m-n}
+J=\boldsymbol r^T\boldsymbol R^{-1}\boldsymbol r.
+\label{eq:chisquare}
 \end{equation}
-Because $r_a \equiv r$, the test cost function $J_a$ does not increase by a single epsilon. The classical residual detector has a detection probability equal to the nominal false alarm rate $\alpha$:
-\begin{equation}
-P(\text{Alarm} \mid a = Hc) = P(J > \chi^2_{\alpha, m-n}) = \alpha
-\end{equation}
-This completes the proof. Classical residual analysis is completely blind to coordinated subspace attacks. $\blacksquare$
+Under the usual assumptions, $J$ is compared with a chi-square
+threshold based on the degrees of freedom. The threshold must be
+selected for the actual measurement and state dimensions and the
+desired significance level. A numerical threshold should not be
+reused without checking those assumptions.
 
-\section{Layer 1: Spatial Mahalanobis Distance Engine}
-To break the blindness of DC residual testing, our engine evaluates the squared Mahalanobis distance across the normalized measurement vector:
+\section{Mahalanobis-Distance Detector}
+Let the preprocessed and normalised feature vector at time $n$ be
+$\boldsymbol q_n\in\mathbb R^4$. Let $\boldsymbol\mu$ be the
+calibration mean and $\boldsymbol\Sigma$ be the calibration
+covariance matrix. The squared Mahalanobis distance is
 \begin{equation}
-D^2 = (z - \mu)^T \Sigma^{-1} (z - \mu) = \tilde{r}^T W \tilde{r}
-\label{eq:mahal}
+D_n^2=
+(\boldsymbol q_n-\boldsymbol\mu)^T
+\boldsymbol\Sigma^{-1}
+(\boldsymbol q_n-\boldsymbol\mu).
+\label{eq:mahalanobis}
 \end{equation}
-where $\tilde{r} = (z - \mu)$ is the centered telemetry vector and $W = \Sigma^{-1}$ is the precision matrix. Under normal operating conditions, $D^2$ follows a Chi-square distribution with $N$ degrees of freedom ($D^2 \sim \chi^2_N$). A spatial anomaly is flagged whenever:
+Define the precision matrix
 \begin{equation}
-D^2 > T^2 = \chi^2_{\alpha, N}
+\boldsymbol W=\boldsymbol\Sigma^{-1}.
 \end{equation}
-Because the empirical covariance $\Sigma$ captures full non-linear AC cross-bus correlations (including voltage drops and reactive power coupling) that linear DC models omit, an attack $a = Hc$ disrupts inter-variable covariance, causing $D^2$ to spike dramatically above $T^2$.
-
-\section{Layer 2: Temporal Two-Sided CUSUM Filter}
-To detect gradual measurement drifts that stay below spatial threshold $T^2$, we implement two-sided Cumulative Sum (CUSUM) control charts for each channel:
-\begin{align}
-S_t^+ &= \max\left(0, \, S_{t-1}^+ + (y_t - \nu_0 - k)\right) \label{eq:cusum_pos} \\
-S_t^- &= \max\left(0, \, S_{t-1}^- - (y_t - \nu_0 + k)\right) \label{eq:cusum_neg}
-\end{align}
-where $y_t$ is the normalized residual, $\nu_0$ is the nominal mean ($0.0$), and $k$ is the reference slack value. For a targeted shift of magnitude $\delta$, optimal sequential testing dictates $k = \delta / 2$ \cite{page1954}. An alarm is raised when either accumulator exceeds the decision threshold $h$:
+Then
 \begin{equation}
-\text{Alarm}_{\text{CUSUM}} = (S_t^+ > h) \lor (S_t^- > h)
+D_n^2=\boldsymbol d_n^T\boldsymbol W\boldsymbol d_n,
+\qquad
+\boldsymbol d_n=\boldsymbol q_n-\boldsymbol\mu.
+\label{eq:quadratic}
+\end{equation}
+The detector raises a spatial anomaly flag when
+\begin{equation}
+A_{M,n}=
+\begin{cases}
+1, & D_n^2>\tau^2,\\
+0, & D_n^2\leq\tau^2.
+\end{cases}
+\label{eq:mahalflag}
 \end{equation}
 
-\section{Average Run Length (ARL) Modeling}
-The performance of sequential CUSUM is governed by the Average Run Length trade-off:
-\begin{itemize}
-    \item $ARL_0$: Expected number of frames before a false alarm when the grid is in control ($\delta = 0$).
-    \item $ARL_1$: Expected number of frames to detect a persistent attack shift ($\delta > 0$).
-\end{itemize}
-Using Page's diffusion approximation for continuous CUSUM with Gaussian increments \cite{page1954}:
+It is important to distinguish Equation~\eqref{eq:mahalanobis}
+from the residual quadratic form in Equation~\eqref{eq:chisquare}.
+The former evaluates a normalised feature vector relative to a
+calibration distribution. The latter evaluates a state-estimation
+residual using the measurement-noise covariance. They are related
+quadratic-form ideas, but they are not automatically the same
+calculation.
+
+\section{Two-Sided CUSUM Detector}
+Let $y_n$ denote the scalar normalised statistic supplied to the
+CUSUM filter at sample $n$. Let $\nu_0$ denote its reference mean
+and $k$ the allowance parameter. The positive CUSUM statistic is
 \begin{equation}
-ARL_0(h) \approx \frac{\exp(2 b h) - 2 b h - 1}{2 b^2 \sigma^2}, \quad \text{where } b = \frac{k}{\sigma^2}
-\label{eq:arl0}
+S_n^+=\max\left(0,\,
+S_{n-1}^+ +(y_n-\nu_0)-k\right),
+\label{eq:cusumplus}
 \end{equation}
+and the negative CUSUM statistic is
 \begin{equation}
-ARL_1(h, \delta) \approx \frac{h}{\delta - k} = \frac{2h}{\delta}
-\label{eq:arl1}
+S_n^-=\max\left(0,\,
+S_{n-1}^- -(y_n-\nu_0)-k\right).
+\label{eq:cusumminus}
 \end{equation}
-Equations (\ref{eq:arl0}) and (\ref{eq:arl1}) establish the operational curve: increasing $h$ exponentially suppresses false alarms ($ARL_0 \to \infty$) at the expense of a linear increase in detection delay ($ARL_1$).
-
-\section{Fixed-Point Precision and Error Bounds}
-The SystemVerilog datapath utilizes signed Q1.15 fixed-point representation (1 sign bit, 15 fractional bits).
+The temporal alarm is
 \begin{equation}
-x_{\text{Q1.15}} = \text{clamp}\left( \left\lfloor x \cdot 2^{15} + 0.5 \right\rfloor, \, -32768, \, 32767 \right)
+A_{C,n}=
+\begin{cases}
+1, & S_n^+>h\ \text{or}\ S_n^->h,\\
+0, & \text{otherwise}.
+\end{cases}
+\label{eq:cusumalarm}
 \end{equation}
-The quantization resolution is $\Delta = 2^{-15} \approx 3.0518 \times 10^{-5}$.
-\begin{itemize}
-    \item \textbf{Rounding Offset:} Intermediate products (Q2.30, 32 bits) are rounded to Q1.15 by adding half-LSB ($+0\text{x}4000 = 2^{14}$) before right-shifting by 15 bits:
-    \begin{equation}
-    y = \left( \text{Product}_{32} + 2^{14} \right) \gg 15
-    \end{equation}
-    \item \textbf{Quantization Signal-to-Noise Ratio (SQNR):}
-    \begin{equation}
-    \text{SQNR} = 6.02 \cdot 15 + 1.76 = 92.06\text{ dB}
-    \end{equation}
-    This high SQNR guarantees that hardware numerical truncation introduces less than $0.003\%$ error relative to 64-bit double precision, well below the physical noise floor of class 0.1 PMU sensors ($0.1\%$).
-\end{itemize}
 
-% =============================================================================
-% CHAPTER FIVE: PROPOSED HARDWARE ARCHITECTURE
-% =============================================================================
-\chapter{Hardware Architecture and RTL Implementation}
+The reference allowance $k$ and decision threshold $h$ determine
+the sensitivity of the detector. A smaller threshold may reduce
+detection delay but increase false alarms. A larger threshold may
+reduce false alarms while allowing smaller or slower changes to
+remain undetected for longer. The parameters should be calibrated
+using normal and representative attacked sequences.
 
-\section{Top-Level Architecture Overview}
-The top-level synthesizable entity \texttt{pmu\_anomaly\_top.sv} integrates five modular hardware blocks communicating via a synchronous internal control bus, as illustrated in the system architectural block diagram in Figure \ref{fig:arch_block}.
+\section{Combined Decision Rule}
+A simple combined decision rule is the logical OR of the spatial
+and temporal flags:
+\begin{equation}
+A_n=A_{M,n}\lor A_{C,n}.
+\label{eq:combinedor}
+\end{equation}
+This rule raises an alarm when either the multivariate score exceeds
+its threshold or the sequential statistic indicates a persistent
+shift. If the implemented RTL uses a different decision policy,
+such as a requirement for both flags, the equation and evaluation
+must be updated to match the actual source code.
 
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.90\textwidth]{results/fdi_alert_timeline.png}
-\caption{System architectural execution and real-time hardware alert timeline.}
-\label{fig:arch_block}
-\end{figure}
+The OR rule favours sensitivity because either detector can trigger
+an alarm. Its potential cost is an increase in false positives.
+The combined detector should therefore be compared against its
+individual components using the same data split and attack labels.
 
-The principal hardware modules comprise:
+\section{Feature Normalisation}
+The selected channels have different physical meanings and may
+have different numerical ranges. A normalisation step is therefore
+required before the covariance-based calculation. A general
+feature-wise transformation is
+\begin{equation}
+q_{n,i}=\frac{x_{n,i}-\mu_i}{s_i},
+\label{eq:normalisation}
+\end{equation}
+where $x_{n,i}$ is the physical feature, $\mu_i$ is its calibration
+mean and $s_i$ is a non-zero scale parameter.
+
+The exact transformation used in the Python implementation must
+be reproduced in the RTL. If the Python model uses a different
+scale, offset or rounding rule from the hardware, the two
+implementations may produce different anomaly scores even when
+the same input data is supplied.
+
+\section{Fixed-Point Representation}
+The hardware design uses signed fixed-point arithmetic. In a
+conventional signed Q1.15 representation, a 16-bit two's-complement
+word has one sign/integer bit and 15 fractional bits. Its approximate
+representable range is
+\begin{equation}
+-1\leq x\leq 1-2^{-15}.
+\end{equation}
+The quantisation step is
+\begin{equation}
+\Delta=2^{-15}\approx 3.05176\times10^{-5}.
+\end{equation}
+With round-to-nearest quantisation, the ideal quantisation error
+is bounded by
+\begin{equation}
+|x-x_Q|\leq\frac{\Delta}{2}=2^{-16}
+\approx1.52588\times10^{-5},
+\end{equation}
+provided the input is within the representable range and no
+saturation occurs.
+
+The conversion from real-valued data to Q1.15 is
+\begin{equation}
+X_{Q15}=\operatorname{round}(X_{\mathrm{real}}\times2^{15}),
+\label{eq:q15forward}
+\end{equation}
+and the reverse conversion is
+\begin{equation}
+X_{\mathrm{real}}\approx\frac{X_{Q15}}{2^{15}}.
+\label{eq:q15reverse}
+\end{equation}
+
+A critical range issue arises when physical quantities such as
+a voltage magnitude or angle have values around 1.57. Such values
+cannot be stored directly in signed Q1.15 because they exceed
+the positive representable limit. They must first be normalised,
+scaled, represented using a wider integer format, or stored in
+a different Q-format. Consequently, the physical means shown in
+the calibration table are not themselves Q1.15 words. The hardware
+must operate on the documented normalised values or use an
+explicit scaling scheme.
+
+\section{Fixed-Point Matrix and Accumulator Considerations}
+The Mahalanobis calculation contains products and sums:
+\begin{equation}
+D_n^2=\sum_{i=1}^{4}\sum_{j=1}^{4}d_{n,i}W_{ij}d_{n,j}.
+\end{equation}
+A 16-bit by 16-bit signed multiplication produces a wider result.
+The fractional position must be adjusted after multiplication,
+and the accumulation width must be sufficient to avoid overflow.
+
+A robust implementation should:
 \begin{enumerate}
-    \item \textbf{Three-Process Moore Controller (\texttt{pmu\_fsm\_ctrl.sv}):} Sequences frame ingestion, preprocessing, matrix multiplication, CUSUM filtering, and memory write-back.
-    \item \textbf{Preprocessing and Mean Centering Unit:} Subtracts calibrated mean $\mu$ and scales by $1/\sigma$.
-    \item \textbf{Pipelined Mahalanobis Matrix Engine (\texttt{mahalanobis\_matrix\_engine.sv}):} Evaluates $y = W \cdot r$ and $D^2 = r^T y$ using 34-bit accumulators.
-    \item \textbf{Two-Sided CUSUM Statistical Filter (\texttt{cusum\_filter\_q15.sv}):} Computes recursive positive and negative sums with non-negative clamping and saturation.
-    \item \textbf{Channel State Memory (\texttt{pmu\_state\_bram.sv}):} Preserves per-channel CUSUM accumulators ($S^+, S^-$) across time-multiplexed evaluations.
+    \item retain the full product width after multiplication;
+    \item apply a documented rounding or truncation rule;
+    \item use a sufficiently wide accumulator for the quadratic form;
+    \item detect or prevent overflow before narrowing the result;
+    \item compare values using a consistent scale for both the
+    score and its threshold.
 \end{enumerate}
 
-\section{Three-Process Moore FSM Controller}
-Control flow strictly follows the canonical Three-Process Moore FSM methodology (Process 1: synchronous state register; Process 2: combinational next-state logic; Process 3: combinational Moore output strobes), eliminating glitch-prone Mealy outputs and preventing inferred latches. The state transition sequence is detailed in Table \ref{tab:fsm_cycles}.
+The CUSUM state also requires care. Repeated additions can exceed
+the range of a 16-bit Q1.15 register. Saturation is preferable to
+silent wraparound when the algorithm is intended to accumulate
+evidence. The exact saturation limits and intermediate widths
+must match the RTL source and be verified by simulation.
 
-\begin{table}[htbp]
+\section{Project Calibration Parameters}
+The available project notes record the following physical and
+calibration values. They are reproduced as reported values, not
+as direct Q1.15 encodings.
+
+\begin{table}[H]
 \centering
-\caption{Finite State Machine (FSM) States and Control Signals}
-\label{tab:fsm_cycles}
-\begin{tabular}{ccll}
+\caption{Reported physical and calibration parameters.}
+\label{tab:calibration}
+\small
+\begin{tabular}{lrrrr}
 \toprule
-\textbf{State} & \textbf{Active Cycles} & \textbf{Active Moore Control Strobes} & \textbf{Datapath Operation} \\
+Parameter & Feature 1 & Feature 2 & Feature 3 & Feature 4 \\
 \midrule
-\texttt{FSM\_IDLE} & 1 & \texttt{data\_ready = 1} & Awaiting upstream \texttt{data\_valid} \\
-\texttt{FSM\_CAPTURE} & 1 & \texttt{latch\_sample\_o = 1} & Registering 4-channel measurement vector \\
-\texttt{FSM\_PREPROCESS} & 1 & \texttt{preprocess\_en\_o = 1} & Mean-centering: $r_i = (x_i - \mu_i) \cdot \sigma^{-1}_i$ \\
-\texttt{FSM\_MAHALANOBIS} & 3 & \texttt{mahal\_start\_o = 1} & 4x4 MVM and quadratic dot product $D^2$ \\
-\texttt{FSM\_CUSUM} & 1 & \texttt{cusum\_en\_o = 1} & Evaluate $S^+, S^-$ for active channel \\
-\texttt{FSM\_DECISION} & 1 & \texttt{decision\_en\_o = 1} & Threshold compare: $D^2 > T^2$ or $S > h$ \\
-\texttt{FSM\_STORE\_RESULT} & 1 & \texttt{bram\_we\_o = 1} & Write updated accumulators to BRAM \\
-\texttt{FSM\_NEXT\_CHANNEL} & 1 & \texttt{chan\_advance\_o = 1} & Increment channel pointer register \\
+Physical mean & 1.570000 & 1.570000 & -1.570000 & 1.045000 \\
+Calibrated mean & 1.571199 & 1.571230 & -1.571271 & 1.044665 \\
+Measurement noise $\sigma$ & 0.020000 & 0.020000 & 0.020000 & 0.005000 \\
+Reported normalisation scale & 0.107858 & 0.111679 & 0.107671 & 0.027304 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\begin{figure}[htbp]
+The reported quantised precision matrix is
+\begin{equation}
+\boldsymbol W_{Q15}=
+\begin{bmatrix}
+27853 & -12383 & 13238 & 1179\\
+-12383 & 25354 & 10197 & 1716\\
+13238 & 10197 & 26615 & -2371\\
+1179 & 1716 & -2371 & 7596
+\end{bmatrix}.
+\label{eq:wq15}
+\end{equation}
+These integer coefficients should be interpreted using the
+scaling convention implemented in the RTL. A matrix whose
+coefficients are stored as Q1.15 does not by itself establish
+that the resulting quadratic-form accumulator is also Q1.15.
+The product and accumulator scaling must be documented separately.
+
+\begin{table}[H]
+\centering
+\caption{Reported detector parameters.}
+\label{tab:thresholds}
+\begin{tabular}{lrrr}
+\toprule
+Parameter & Integer value & Hexadecimal & Reported real value \\
+\midrule
+Mahalanobis threshold $\tau^2$ & 1673 & 0x0689 & 0.05106 \\
+CUSUM allowance $k$ & 5461 & 0x1555 & 0.16666 \\
+CUSUM threshold $h$ & 20753 & 0x5111 & 0.63309 \\
+CUSUM reference $\nu_0$ & 0 & 0x0000 & 0.00000 \\
+Chi-square threshold & -- & -- & 11.345 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The chi-square threshold is shown as a reported reference value.
+Its correct use depends on the number of degrees of freedom and
+the selected significance level. It should not be directly compared
+with a Mahalanobis threshold unless the underlying statistics,
+normalisation and degrees of freedom have been made compatible.
+
+\section{Latency and Throughput Definitions}
+If a hardware implementation processes one frame in $N_{\mathrm{cyc}}$
+clock cycles at clock frequency $f_{\mathrm{clk}}$, its ideal
+frame latency is
+\begin{equation}
+T_{\mathrm{lat}}=\frac{N_{\mathrm{cyc}}}{f_{\mathrm{clk}}}.
+\label{eq:latency}
+\end{equation}
+If one frame contains four features, the ideal feature throughput
+is
+\begin{equation}
+\Theta=\frac{4f_{\mathrm{clk}}}{N_{\mathrm{cyc}}}
+\quad\text{features per second}.
+\label{eq:throughput}
+\end{equation}
+These equations define how latency and throughput should be
+calculated once the clock frequency and cycle count have been
+verified. They are not measured results in this report.
+
+The maximum operating frequency must be derived from a valid
+timing analysis with appropriate clock and I/O constraints.
+A synthesis resource report without timing constraints is not
+sufficient to establish $f_{\max}$ or timing closure.
+
+% =====================================================================
+% CHAPTER FOUR
+% =====================================================================
+\chapter{Methodology and Hardware Implementation}
+
+\section{Overall Methodology}
+The project follows a staged workflow:
+\begin{enumerate}
+    \item define the measurement and attack scenarios;
+    \item generate and preprocess measurement data in Python;
+    \item calibrate the statistical reference parameters;
+    \item evaluate the Mahalanobis and CUSUM algorithms;
+    \item translate the arithmetic and control functions into
+    SystemVerilog;
+    \item synthesize the RTL for the target FPGA;
+    \item inspect synthesis reports, warnings and resource usage;
+    \item identify the additional verification required for
+    hardware deployment.
+\end{enumerate}
+
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}[
-    node distance=1.0cm and 1.5cm,
-    state/.style={rectangle, rounded corners=4pt, draw=blue!70!black, fill=blue!5, thick, inner sep=5pt, text width=3.2cm, align=center, font=\footnotesize\bfseries},
-    edge/.style={->, >=Latex, thick, draw=black!75},
-    ann/.style={font=\scriptsize\itshape, text=black!85}
+  node distance=0.55cm and 0.55cm,
+  box/.style={draw,rounded corners,align=center,font=\small,
+              minimum height=0.9cm,minimum width=2.35cm},
+  arrow/.style={-{Stealth[length=2mm]},thick}
 ]
-
-% Nodes arranged in a clear loop
-\node[state] (idle)       {\texttt{FSM\_IDLE}\\ \scriptsize \texttt{data\_ready=1}};
-\node[state] (capture)    [below=of idle] {\texttt{FSM\_CAPTURE}\\ \scriptsize \texttt{latch\_sample=1}};
-\node[state] (prep)       [below=of capture] {\texttt{FSM\_PREPROCESS}\\ \scriptsize \texttt{preprocess\_en=1}};
-\node[state] (mahal)      [right=1.8cm of prep] {\texttt{FSM\_MAHALANOBIS}\\ \scriptsize \texttt{mahal\_start=1}};
-\node[state] (cusum)      [right=1.8cm of capture] {\texttt{FSM\_CUSUM}\\ \scriptsize \texttt{cusum\_en=1}};
-\node[state] (decision)   [right=1.8cm of idle] {\texttt{FSM\_DECISION}\\ \scriptsize \texttt{decision\_en=1}};
-\node[state] (store)      [right=1.8cm of decision] {\texttt{FSM\_STORE\_RESULT}\\ \scriptsize \texttt{bram\_we=1}};
-\node[state] (next)       [below=of store] {\texttt{FSM\_NEXT\_CHANNEL}\\ \scriptsize \texttt{chan\_advance=1}};
-
-% Edges
-\path[edge] (idle) edge node[left, ann] {\texttt{data\_valid=1}} (capture);
-\path[edge] (idle) edge[loop left] node[left, ann] {\texttt{!data\_valid}} (idle);
-\path[edge] (capture) edge (prep);
-\path[edge] (prep) edge (mahal);
-\path[edge] (mahal) edge[loop below] node[below, ann] {\texttt{!mahal\_done}} (mahal);
-\path[edge] (mahal) edge node[right, ann] {\texttt{mahal\_done=1}} (cusum);
-\path[edge] (cusum) edge (decision);
-\path[edge] (decision) edge (store);
-\path[edge] (store) edge (next);
-\path[edge] (next) edge[bend right=40] node[above, ann] {\texttt{channel\_last=1}} (idle);
-\path[edge] (next) edge[dashed, bend left=20] node[below, ann] {\texttt{!channel\_last}} (capture);
-
+\node[box] (spec) {Problem specification};
+\node[box,right=of spec] (data) {Python data generation};
+\node[box,right=of data] (model) {Statistical reference model};
+\node[box,below=of model] (rtl) {SystemVerilog RTL};
+\node[box,left=of rtl] (synth) {Vivado synthesis};
+\node[box,left=of synth] (review) {Report and result review};
+\draw[arrow] (spec)--(data);
+\draw[arrow] (data)--(model);
+\draw[arrow] (model)--(rtl);
+\draw[arrow] (rtl)--(synth);
+\draw[arrow] (synth)--(review);
 \end{tikzpicture}
-\caption{Three-Process Moore Finite State Machine (FSM) State Transition Diagram showing the deterministic execution graph across time-multiplexed channels.}
-\label{fig:fsm_state_diagram}
+\caption{Overall software-to-hardware project workflow.}
+\label{fig:workflow}
 \end{figure}
 
-\section{Cycle Count and Throughput Model}
-From Table \ref{tab:fsm_cycles}, processing one channel requires 9 clock cycles:
-\begin{equation}
-T_{\text{chan}} = 1\text{ (Capture)} + 1\text{ (Preprocess)} + 3\text{ (Mahalanobis)} + 1\text{ (CUSUM)} + 1\text{ (Decide)} + 1\text{ (Store)} + 1\text{ (Advance)} = 9\text{ cycles}
-\end{equation}
-For $N = 4$ channels, the total frame latency is:
-\begin{equation}
-T_{\text{frame}} = 4 \times 9\text{ cycles} = \mathbf{36\text{ clock cycles}}
-\end{equation}
-At an operating frequency of $f_{\text{clk}} = 100\text{ MHz}$ ($T_{\text{clk}} = 10.0\text{ ns}$):
-\begin{equation}
-T_{\text{latency}} = 36 \times 10.0\text{ ns} = \mathbf{360\text{ nanoseconds per frame}}
-\end{equation}
-The sustained streaming throughput is:
-\begin{equation}
-\text{Throughput} = \frac{100 \times 10^6\text{ Hz}}{36\text{ cycles/frame}} \approx \mathbf{2,777,777\text{ frames/second}}
-\end{equation}
-Because PMUs report at $50\text{ frames/second}$ ($20\text{ ms}$), the engine operates approximately $\mathbf{55,000\times}$ faster than real-time wire speed.
+\section{Python Telemetry Generation}
+The Python reference model generates a four-dimensional measurement
+stream using features identified in the project records as
+$V_1$, $V_2$, $P_{12}$ and $Q_{12}$. The underlying network scenario
+is derived from the IEEE~14-bus benchmark. The benchmark provides
+a standard power-system case for simulation and analysis
+\cite{zimmerman2011,matpowercase14}.
 
-\section{Memory Mapping and Dual RAMB18E1 Inference Analysis}
-The channel state register packed struct requires 42 active bits per channel ($S^+$: 16 bits, $S^-$: 16 bits, alert flags: 3 bits, counter: 7 bits). In the synthesis run targeting the AC701, Vivado inferred **two RAMB18E1 primitives**:
-\begin{itemize}
-    \item \textbf{Reason for 2 BRAMs:} In Xilinx 7-Series FPGAs, a single `RAMB18E1` slice supports a maximum data width of 36 bits in Simple Dual-Port mode (or 18 bits in True Dual-Port mode). Because the channel struct requires $42\text{ bits} > 36\text{ bits}$, Vivado is physically constrained to allocate two physical RAMB18 blocks side-by-side to assemble the 42-bit data word width.
-    \item \textbf{Distributed LUTRAM Alternative:} Because the depth is only 8 words ($8 \times 42 = 336\text{ bits}$), setting attribute \texttt{(* ram\_style = "distributed" *)} maps this state memory into just **11 SLICEM LUTs** (\texttt{RAM32X1S}), freeing both Block RAM tiles completely and eliminating the 1-cycle BRAM read latency.
-\end{itemize}
+The generated data is used to represent normal operating behaviour
+and simulated attack behaviour. The three attack categories are:
+\begin{enumerate}
+    \item \textbf{Abrupt FDI:} a sudden injected deviation in one
+    or more measurement channels.
+    \item \textbf{Gradual-ramp FDI:} a deviation that increases
+    over a sequence of samples.
+    \item \textbf{Coordinated or stealth-oriented FDI:} changes
+    applied across multiple measurements according to a structured
+    relationship intended to model a more difficult attack case.
+\end{enumerate}
 
-% =============================================================================
-% CHAPTER SIX: IMPLEMENTATION AND EXPERIMENTAL SETUP
-% =============================================================================
-\chapter{Implementation and Experimental Setup}
+The word ``stealth-oriented'' describes the simulated construction.
+It does not mean that every generated coordinated attack satisfies
+the exact state-estimation stealth condition for every measurement
+configuration. That claim requires checking the generated attack
+vector against the measurement matrix.
 
-\section{Hardware Toolchain and Target FPGA}
-The digital hardware design was implemented, synthesized, and verified using the AMD/Xilinx Vivado Design Suite targeting the Artix-7 AC701 Evaluation Kit. Specifications are listed in Table \ref{tab:hw_setup}.
+\section{Calibration and Evaluation Split}
+The later project description records 200 calibration frames and
+a total experiment length of 1,200 frames, with the remaining
+1,000 frames intended for evaluation. This is a plausible split,
+but the reported confusion matrix and performance metrics in the
+later notes sum to 1,200 samples. These statements cannot both
+describe the same evaluation set without further explanation.
 
-\begin{table}[htbp]
+For this reason, the final evaluation split must be confirmed from
+the Python CSV or evaluation log. The report keeps the two reported
+experiments separate in Chapter Five and does not silently combine
+their metrics. Calibration data must not be included in the test
+set used to report generalisation performance.
+
+\section{Statistical Processing Pipeline}
+The intended statistical pipeline is:
+\begin{enumerate}
+    \item receive a new four-feature measurement frame;
+    \item apply the same preprocessing and normalisation used
+    during calibration;
+    \item subtract the calibration mean;
+    \item calculate the Mahalanobis quadratic form;
+    \item update the positive and negative CUSUM states using
+    the defined scalar input statistic;
+    \item compare both statistics with their thresholds;
+    \item combine the detector flags according to the implemented
+    decision rule;
+    \item store or transmit the result.
+\end{enumerate}
+
+The Python reference implementation provides the algorithmic
+baseline. For hardware equivalence, the Python and RTL paths must
+use the same input values, parameter encodings, rounding, saturation,
+initial states and decision comparisons.
+
+\section{Hardware Architecture}
+The hardware design is organised around a top-level module and
+supporting processing and control modules. The available module
+inventory is summarised in Table~\ref{tab:rtlmodules}.
+
+\begin{table}[H]
 \centering
-\caption{Hardware Implementation and Experimental Toolchain Setup}
-\label{tab:hw_setup}
+\caption{SystemVerilog module inventory recorded for the design.}
+\label{tab:rtlmodules}
+\begin{tabular}{p{5.2cm}p{8.0cm}}
+\toprule
+Module & Intended responsibility \\
+\midrule
+\texttt{pmu\_anomaly\_top.sv} &
+Top-level integration of input, processing, control and result signals.\\
+\texttt{pmu\_fsm\_ctrl.sv} &
+Main finite-state-machine controller for the processing sequence.\\
+\texttt{pmu\_state\_bram.sv} &
+State or intermediate-result storage using inferred memory.\\
+\texttt{mahalanobis\_matrix\_engine.sv} &
+Matrix-vector and quadratic-form arithmetic for the Mahalanobis score.\\
+\texttt{cusum\_filter\_q15.sv} &
+Positive and negative fixed-point CUSUM update and threshold logic.\\
+\texttt{fdi\_pkg.sv} &
+Shared package containing types, constants and parameter definitions.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The module inventory describes the intended design organisation.
+The exact interface, widths and state transitions should be taken
+from the final source files supplied to Vivado.
+
+% ---------------- NEW: HARDWARE ARCHITECTURE DIAGRAMS ----------------
+\section{Hardware Architecture Diagram}
+Figure~\ref{fig:hardware_choose} shows the hardware-block selection
+that led to the final datapath choice. Figure~\ref{fig:schematic}
+presents the RTL-level schematic of the design as elaborated by
+Vivado, and Figure~\ref{fig:circuit} shows the circuit-level
+schematic of the detector datapath with the two-sided CUSUM feedback
+paths explicitly drawn.
+
+\reportfigure[0.95\textwidth]{hardware_choose.png}
+{Hardware-block selection for the detector datapath: capture,
+preprocess, Mahalanobis engine, two-sided CUSUM and decision logic.}
+{fig:hardware_choose}
+
+\reportfigure[0.95\textwidth]{schematic.png}
+{Elaborated RTL schematic of the \texttt{pmu\_anomaly\_top} design,
+showing the top-level modules and their connections.}
+{fig:schematic}
+
+\reportfigure[0.95\textwidth]{circuit_diagram.png}
+{Circuit-level schematic of the proposed anomaly detector:
+the Mahalanobis quadratic-form engine feeds the two-sided CUSUM
+accumulators, whose positive and negative branches drive the alarm
+comparators and the combined decision output.}
+{fig:circuit}
+
+\section{Two-Sided CUSUM RTL}
+The CUSUM module implements the recurrence in
+Equations~\eqref{eq:cusumplus} and \eqref{eq:cusumminus}.
+The principal operations are:
+\begin{enumerate}
+    \item accept a valid sample and the current reference parameters;
+    \item calculate the positive and negative candidate updates;
+    \item clamp negative candidate values to zero;
+    \item saturate values that exceed the accumulator range;
+    \item update the CUSUM state registers;
+    \item assert the positive or negative alarm when its state
+    exceeds the threshold.
+\end{enumerate}
+
+The project notes describe 18-bit signed intermediate arithmetic
+and 16-bit Q1.15 state registers. The actual RTL should be inspected
+to confirm that intermediate widths are sufficient and that
+truncation, rounding and saturation are implemented consistently.
+An active-low asynchronous reset is described in the project
+notes; the reset connection must be checked at the integrated
+top level because the synthesis report reportedly identifies an
+unconnected reset on the state-memory module.
+
+\section{Main Controller Finite-State Machine}
+The main controller is described as an eight-state Moore-style
+finite-state machine. The states recorded in the design notes are:
+\begin{enumerate}
+    \item \texttt{IDLE}: wait for a valid start or sample condition;
+    \item \texttt{CAPTURE}: capture the incoming measurement frame;
+    \item \texttt{PREPROCESS}: prepare or normalise the feature data;
+    \item \texttt{MAHALANOBIS}: perform the spatial statistical test;
+    \item \texttt{CUSUM}: update the sequential detector;
+    \item \texttt{DECISION}: combine the detector outputs;
+    \item \texttt{STORE\_RESULT}: store the result and status;
+    \item \texttt{NEXT\_CHANNEL}: advance to the next channel or frame.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=1.05cm,
+  state/.style={circle,draw,minimum size=1.15cm,font=\scriptsize,align=center},
+  arrow/.style={-{Stealth[length=2mm]},thick}
+]
+\node[state] (idle) {IDLE};
+\node[state,right=of idle] (cap) {CAPTURE};
+\node[state,right=of cap] (pre) {PRE\\PROCESS};
+\node[state,below=of pre] (mah) {MAHA\\LANOBIS};
+\node[state,left=of mah] (cus) {CUSUM};
+\node[state,left=of cus] (dec) {DECISION};
+\node[state,below=of dec] (store) {STORE\\RESULT};
+\node[state,right=of store] (next) {NEXT\\CHANNEL};
+\draw[arrow] (idle)--(cap);
+\draw[arrow] (cap)--(pre);
+\draw[arrow] (pre)--(mah);
+\draw[arrow] (mah)--(cus);
+\draw[arrow] (cus)--(dec);
+\draw[arrow] (dec)--(store);
+\draw[arrow] (store)--(next);
+\draw[arrow] (next.west) -- ++(-0.45,0) |- (idle.south);
+\end{tikzpicture}
+\caption{Conceptual eight-state processing sequence.}
+\label{fig:mainfsm}
+\end{figure}
+
+The diagram represents the state sequence described in the project
+notes. The exact transition conditions, including wait states,
+handshake signals and error paths, must be taken from the final RTL.
+
+\section{Mahalanobis Engine Controller}
+The Mahalanobis engine is described as having four states:
+\texttt{M\_IDLE}, \texttt{M\_MVM}, \texttt{M\_DOT} and
+\texttt{M\_DONE}. The matrix-vector stage evaluates the
+four-dimensional multiplication, while the dot-product stage
+completes the quadratic form. The precise number of cycles depends
+on the actual datapath parallelism, memory access timing and
+handshake implementation. No measured cycle count is claimed
+in this report.
+
+\section{Target FPGA Platform}
+The selected evaluation platform and device are shown in
+Table~\ref{tab:target}.
+
+\begin{table}[H]
+\centering
+\caption{Target FPGA platform.}
+\label{tab:target}
 \begin{tabular}{ll}
 \toprule
-\textbf{Parameter} & \textbf{Value / Specification} \\
+Parameter & Specification \\
 \midrule
-FPGA Evaluation Kit & AMD / Xilinx AC701 Evaluation Kit \\
-Target Device & Artix-7 XC7A200T (\texttt{xc7a200tfbg676-2}) \\
-Development Environment & AMD Vivado Design Suite v2026.1 (64-bit) \\
-Hardware Description Language & Synthesizable SystemVerilog (IEEE 1800-2017) \\
-Target Clock Frequency & $100.0\text{ MHz}$ ($10.0\text{ ns}$ clock period) \\
-Constraints File & \texttt{constraints/ac701\_timing.xdc} \\
-Python Simulation Suite & Python 3.14.3 (NumPy, SciPy, Pandas, Matplotlib) \\
+Evaluation kit & AC701 \\
+FPGA family & AMD/Xilinx Artix-7 \\
+Device & XC7A200T \\
+Package & FBG676 \\
+Speed grade & -2 \\
+Vivado version recorded & 2026.1 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Telemetry Dataset Generation and Attack Injection}
-The experimental dataset comprises $1,200$ PMU telemetry frames generated by \texttt{python/generate\_telemetry.py}.
-\begin{itemize}
-    \item \textbf{Clean Calibration Window ($t = 0 \dots 199$):} Strictly reserved for baseline statistical calibration ($\mu, \Sigma$). Zero attack frames appear here, preventing test-set data leakage.
-    \item \textbf{Scenario 1: Stealth FDI ($a = Hc$, $t = 200 \dots 350$):} Attacker perturbs $\theta_2$ by $c = +0.035\text{ rad}$, injecting coordinated vectors matching $a = Hc$.
-    \item \textbf{Scenario 2: Persistent Ramp / Drift ($t = 450 \dots 650$):} Linear slope on active power flow $P_{12}$ rising from $0$ to $+0.08\text{ p.u.}$ over 200 frames.
-    \item \textbf{Scenario 3: Multiplicative Scaling ($t = 750 \dots 870$):} False scaling attack multiplying $P_{12}$ by $(1 + \lambda)$ where $\lambda = +5\%$.
-    \item \textbf{Scenario 4: Replay Attack ($t = 950 \dots 1071$):} Replaying historical clean telemetry ($t = 50 \dots 170$) during dynamic load fluctuations.
-\end{itemize}
+The exact device/package selection must agree with the Vivado
+project and the board's fitted FPGA. Device-level resource
+availability should be taken from the selected part and package,
+not inferred from a different Artix-7 device.
 
-% =============================================================================
-% CHAPTER SEVEN: RESULTS AND PERFORMANCE EVALUATION
-% =============================================================================
-\chapter{Results and Performance Evaluation}
+\section{Synthesis and Verification Workflow}
+The synthesis stage translates RTL into a technology-mapped
+netlist. The utilization report provides estimates of resources
+such as LUTs, registers, block RAM and DSP slices. It does not
+prove that the design meets a clock period or functions correctly
+on a physical board.
 
-\section{Statistical Detection Performance}
-The detection performance across the complete 1,200-sample dataset was evaluated by comparing the Proposed Dual-Layer FPGA Engine against the Classical $\chi^2$ Residual Test ($J = r^T R^{-1} r$), Mahalanobis Alone ($D^2 > T^2$), and CUSUM Alone ($S > h$). The empirical results are detailed in Table \ref{tab:results_comparison}.
-
-\begin{table}[htbp]
-\centering
-\caption{Quantitative Detection Performance Comparison (1,200 PMU Frames)}
-\label{tab:results_comparison}
-\begin{tabular}{lcccc}
-\toprule
-\textbf{Performance Metric} & \textbf{Proposed Dual-Layer} & \textbf{Classical $\chi^2$ BDD} & \textbf{Mahalanobis Alone} & \textbf{CUSUM Alone} \\
-\midrule
-True Positives (TP) & \textbf{423} & 109 & 414 & 385 \\
-False Positives (FP) & 16 & \textbf{0} & 3 & 11 \\
-True Negatives (TN) & 593 & \textbf{609} & 606 & 598 \\
-False Negatives (FN) & \textbf{168} & 482 & 177 & 206 \\
-\midrule
-\textbf{Accuracy} & \textbf{84.67\%} & 59.83\% & 85.00\% & 81.33\% \\
-\textbf{Precision} & \textbf{96.36\%} & 100.00\% & 99.28\% & 97.46\% \\
-\textbf{Recall (Detection Rate)} & \textbf{71.57\%} & 18.44\% & 70.05\% & 65.14\% \\
-\textbf{F1-Score} & \textbf{0.8214} & 0.3114 & 0.8214 & 0.7809 \\
-\textbf{False Positive Rate (FPR)} & 2.63\% & \textbf{0.00\%} & 0.49\% & 1.81\% \\
-\textbf{Area Under Curve (AUC)} & \textbf{0.94} & 0.59 & 0.88 & 0.82 \\
-\midrule
-\textbf{Stealth ($a=Hc$) Rate} & \textbf{100.0\%} & 35.3\% (\textit{FAILS}) & 100.0\% & 98.7\% \\
-\textbf{Ramp Drift ($P_{12}$) Rate} & \textbf{76.0\%} & 6.5\% (\textit{FAILS}) & 71.5\% & 68.0\% \\
-\textbf{Scaling Attack Rate} & \textbf{100.0\%} & 35.8\% & 100.0\% & 95.0\% \\
-\midrule
-\textbf{Stealth Latency} & \textbf{0 ms (0 cycles)} & 80 ms (4 spls) & 0 ms & 40 ms \\
-\textbf{Ramp Drift Latency} & \textbf{600 ms (30 spls)} & 2520 ms (126 spls) & 600 ms & 680 ms \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section{Analysis of Experimental Figures}
-
-\subsection{Multi-Channel PMU Telemetry with Attack Spans}
-Figure \ref{fig:telemetry} depicts the 4-channel telemetry across all 1,200 time steps. The shaded intervals indicate the four attack scenarios. Clean frames ($t=0\dots199$) clearly show normal Gaussian fluctuations.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.95\textwidth]{results/pmu_telemetry_attacks.png}
-\caption{Four-channel PMU telemetry showing simulated FDI attack intervals.}
-\label{fig:telemetry}
-\end{figure}
-
-\subsection{Layer 1 Spatial Mahalanobis Distance Trajectory}
-Figure \ref{fig:mahalanobis} displays the squared Mahalanobis distance metric $D^2$ evaluated by \texttt{mahalanobis\_matrix\_engine.sv}. Notice that during Scenario 1 (Stealth) and Scenario 3 (Scaling), $D^2$ immediately crosses spatial threshold $T^2 = 2,600$, demonstrating zero-latency detection.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.90\textwidth]{results/mahalanobis_vs_threshold.png}
-\caption{Mahalanobis distance trajectory and detection threshold $T^2$.}
-\label{fig:mahalanobis}
-\end{figure}
-
-\subsection{Layer 2 Temporal CUSUM Accumulator Trajectories}
-Figure \ref{fig:cusum} plots recursive positive and negative CUSUM statistics ($S^+, S^-$). During the gradual drift on active power $P_{12}$ ($t = 450 \dots 650$), $S^+$ steadily climbs, crossing decision threshold $h = 22,000$ at sample 480 ($600\text{ ms}$ delay), successfully alarming before the physical line overheats.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.90\textwidth]{results/cusum_vs_threshold.png}
-\caption{Positive and negative CUSUM trajectories and decision threshold $h$.}
-\label{fig:cusum}
-\end{figure}
-
-\subsection{Real-Time Hardware Alert Interrupt Timeline}
-Figure \ref{fig:alarm} illustrates the real-time assertion of hardware output flags: \texttt{spatial\_alert\_o}, \texttt{temporal\_alert\_o}, and master \texttt{fdi\_alert\_o}. The red aggregated trace matches the ground-truth attack window with minimal false alarms ($2.63\%$).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.95\textwidth]{results/fdi_alert_timeline.png}
-\caption{Real-time hardware anomaly interrupt timeline vs. ground truth.}
-\label{fig:alarm}
-\end{figure}
-
-\subsection{Head-to-Head Comparison vs. Classical Bad Data Detection}
-Figure \ref{fig:chi2} provides the defining benchmark comparison. In the top subplot, classical residual $J = r^T R^{-1} r$ stays below the $\chi^2$ threshold during the stealth attack ($t = 200 \dots 350$). In stark contrast, the proposed Mahalanobis distance (middle) and CUSUM (bottom) trigger instantaneous and sustained alarms.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.95\textwidth]{results/chi2_vs_mahalanobis_comparison.png}
-\caption{Comparison of classical Chi-square residual detection ($J$) vs. proposed Mahalanobis and CUSUM detectors.}
-\label{fig:chi2}
-\end{figure}
-
-\subsection{Receiver Operating Characteristic (ROC) Comparison}
-Figure \ref{fig:roc} presents empirical ROC curves. The Proposed Dual-Layer Engine achieves an **Area Under Curve ($\text{AUC}$) of $0.94$**, outperforming Mahalanobis Alone ($\text{AUC} = 0.88$) and thoroughly surpassing Classical $\chi^2$ BDD ($\text{AUC} = 0.59$).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.80\textwidth]{results/roc_curve.png}
-\caption{Receiver Operating Characteristic (ROC) curves comparing proposed and baseline detectors.}
-\label{fig:roc}
-\end{figure}
-
-\subsection{Detection Delay vs. Attack Magnitude}
-Figure \ref{fig:delay} illustrates detection delay $\tau$ as a function of attack perturbation magnitude $\|\delta\|$. For large injections ($\|\delta\| \ge 0.04\text{ p.u.}$), detection is instantaneous ($\tau = 0$). For subtle drifts ($\|\delta\| < 0.04\text{ p.u.}$), latency follows Wald's CUSUM identity $\tau \approx h / (\|\delta\| - k)$.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{results/detection_delay_vs_magnitude.png}
-\caption{Detection delay $\tau$ (cycles and milliseconds) against attack magnitude $\|\delta\|$.}
-\label{fig:delay}
-\end{figure}
-
-\subsection{Average Run Length (ARL) Operating Trade-Off}
-Figure \ref{fig:arl} confirms Page's theoretical trade-off: sweeping $h$ from $5,000$ to $30,000$ exponentially extends in-control run length $ARL_0$. The calibrated FPGA operating point ($h=22,000$) achieves $ARL_0 = 38.1\text{ frames}$ with an out-of-control detection latency of $ARL_1 = 8.0\text{ frames}$ ($160\text{ ms}$).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.85\textwidth]{results/arl_tradeoff_curve.png}
-\caption{Average Run Length ($ARL_1$ vs. $ARL_0$) trade-off curves (Page, 1954).}
-\label{fig:arl}
-\end{figure}
-
-\subsection{Empirical Detection Latency Cumulative Distribution Function (CDF)}
-Figure \ref{fig:latency} plots the latency CDF. Over $75\%$ of detected attacks alarm within $\le 2$ frames ($< 40\text{ ms}$), and $100\%$ trigger within $35$ frames ($< 700\text{ ms}$).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.80\textwidth]{results/latency_cdf.png}
-\caption{Empirical cumulative distribution function (CDF) of FDI detection latency.}
-\label{fig:latency}
-\end{figure}
-
-\section{Vivado Post-Synthesis Hardware Resource Utilization}
-The actual post-synthesis utilization report generated by Vivado v2026.1 for the AC701 (\texttt{xc7a200tfbg676-2}) is reported in Table \ref{tab:vivado_resources}.
-
-\begin{table}[htbp]
-\centering
-\caption{Vivado Synthesis Resource Utilization Report for Artix-7 AC701}
-\label{tab:vivado_resources}
-\begin{tabular}{lccc}
-\toprule
-\textbf{Resource Primitive} & \textbf{Used Count} & \textbf{Device Budget} & \textbf{Utilization (\%)} \\
-\midrule
-\textbf{DSP48E1 Slices} & 24 & 740 & 3.24\% \\
-\textbf{Block RAM (RAMB18E1)} & 2 & 730 & 0.27\% \\
-\textbf{Slice LUTs} & 1,381 & 134,600 & 1.03\% \\
-\textbf{Slice Registers (FFs)} & 647 & 269,200 & 0.24\% \\
-\textbf{CARRY4 Chains} & 123 & 33,650 & 0.37\% \\
-\textbf{Global Clock Buffers (BUFG)} & 1 & 32 & 3.12\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-% =============================================================================
-% CHAPTER EIGHT: DISCUSSION, ABLATION AND LIMITATIONS
-% =============================================================================
-\chapter{Discussion, Ablation and Limitations}
-
-\section{Ablation Study}
-To evaluate the individual contribution of each detection mechanism, an ablation study was conducted across the four attack classes, as summarized in Table \ref{tab:ablation}.
-
-\begin{table}[htbp]
-\centering
-\caption{Ablation Study of Individual Detection Layers}
-\label{tab:ablation}
-\begin{tabular}{lcccc}
-\toprule
-\textbf{Configuration} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Stealth Recall} & \textbf{Ramp Drift Recall} \\
-\midrule
-Full Proposed Engine (MD + CUSUM) & \textbf{84.67\%} & \textbf{96.36\%} & \textbf{100.0\%} & \textbf{76.0\%} \\
-Ablation A: Mahalanobis Alone     & 85.00\% & 99.28\% & 100.0\% & 71.5\% \\
-Ablation B: CUSUM Alone           & 81.33\% & 97.46\% & 98.7\%  & 68.0\% \\
-Ablation C: Classical $\chi^2$ BDD & 59.83\% & 100.00\% & 35.3\% & 6.5\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\noindent\textbf{Findings:} Removing CUSUM drops ramp drift recall by $4.5\%$ and increases detection latency by $120\text{ ms}$. Removing Mahalanobis causes stealth attacks to slip through for up to 2 frames before temporal accumulation triggers. Only the combined dual-layer engine provides robust protection across both sudden subspace and slow-drift attacks.
-
-\section{Threats to Validity and Honest Limitations}
-In adherence to the academic integrity guidelines of Redeemer's University, we explicitly document the limitations of this work:
+A complete FPGA verification workflow should include:
 \begin{enumerate}
-    \item \textbf{Post-Synthesis vs. Post-Implementation:} While synthesis completed with 0 errors and zero timing violations at $100\text{ MHz}$, final physical pin assignment is constrained because the core exposes 515 bus bits. A full deployment requires wrapping the engine in an AXI4-Stream slave IP core.
-    \item \textbf{Four-Channel Prototype:} The current prototype models a 4-dimensional feeder. While scalable, expanding to a 30-bus grid will scale the precision matrix $W$ to $60 \times 60$, requiring folded matrix-vector pipelining to preserve DSP budget.
-    \item \textbf{Stationary Covariance Assumption:} Covariance matrix $\Sigma$ was calibrated on steady-state power flow. Grid topology reconfigurations (e.g., line tripping) will alter $\Sigma$, requiring dynamic parameter re-loading from the central EMS.
+    \item RTL linting and elaboration;
+    \item self-checking behavioral simulation;
+    \item fixed-point comparison against the Python reference;
+    \item synthesis and utilization review;
+    \item timing constraints and static timing analysis;
+    \item implementation, placement and routing;
+    \item post-implementation timing and power analysis;
+    \item board-level tests using a documented input/output interface.
 \end{enumerate}
 
-% =============================================================================
-% CHAPTER NINE: CONCLUSION AND FUTURE WORK
-% =============================================================================
-\chapter{Conclusion and Future Work}
+The current project records establish a synthesis result, but do
+not establish completion of all these stages.
 
-\section{Summary of Achievements}
-This course project delivered a synthesizable, hardware-verifiable Smart Grid False Data Injection Anomaly Engine combining Mahalanobis distance and two-sided CUSUM filtering:
+% =====================================================================
+% CHAPTER FIVE
+% =====================================================================
+\chapter{Results and Discussion}
+%
+% FIGURE FILENAMES EXPECTED IN results/ (rename your files to match):
+%   pmu_telemetry_attacks.png
+%   mahalanobis_vs_threshold.png
+%   cusum_vs_threshold.png
+%   fdi_alert_timeline.png
+%   chi2_vs_mahalanobis_comparison.png
+%   roc_curve.png
+%   detection_delay_vs_magnitude.png
+%   arl_tradeoff_curve.png
+%   latency_cdf.png
+%   synthesis_design.png
+%   synthesis_design_2.png
+
+\section{Overview of Available Results}
+The available project records contain Python performance values
+from two differently sized experiments and Vivado synthesis
+resource values from more than one report version. These values
+are presented separately to avoid creating a result set that
+cannot be traced to one experiment or one authoritative report.
+
+\section{Python Detection Results: Earlier 1,000-Frame Run}
+An earlier report draft records a 1,000-frame experiment with the
+classification metrics shown in Table~\ref{tab:oldmetrics}. These
+values are reproduced as an earlier reported run. They should be
+retained only if the original evaluation output confirms the
+sample count, class distribution and metric calculation.
+
+\begin{table}[H]
+\centering
+\caption{Earlier reported Python experiment (1,000 frames).}
+\label{tab:oldmetrics}
+\begin{tabular}{lccccc}
+\toprule
+Detector & Accuracy & Precision & Recall & F1-score & FPR \\
+\midrule
+Proposed combined detector & 87.70\% & 97.03\% & 76.22\% & 0.8537 & 2.08\% \\
+Mahalanobis only & 86.20\% & 98.83\% & 71.55\% & 0.8300 & 0.76\% \\
+CUSUM only & 87.30\% & 98.04\% & 74.52\% & 0.8468 & 1.32\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In this earlier result set, the combined detector has the highest
+reported recall and F1-score among the three listed detectors.
+It also has a higher reported false-positive rate than either
+individual detector. This is consistent with the expected trade-off
+of a combined OR-style decision rule, but the conclusion is valid
+only if all methods were evaluated on the same frames with the
+same labels and threshold-selection protocol.
+
+\section{Python Detection Results: Later 1,200-Frame Report}
+A later draft reports the confusion-matrix counts
+$TP=423$, $FN=168$, $FP=16$ and $TN=593$. These counts sum to
+1,200 observations. The corresponding metrics are shown in
+Table~\ref{tab:newmetrics}.
+
+\begin{table}[H]
+\centering
+\caption{Later reported combined-detector result (1,200 observations).}
+\label{tab:newmetrics}
+\begin{tabular}{lcc}
+\toprule
+Metric & Reported value & Interpretation \\
+\midrule
+True positives & 423 & Attacks correctly detected \\
+False negatives & 168 & Attacks missed by the detector \\
+False positives & 16 & Normal samples incorrectly flagged \\
+True negatives & 593 & Normal samples correctly classified \\
+Accuracy & 84.67\% & Overall fraction correctly classified \\
+Precision & 96.36\% & Fraction of alarms that were true attacks \\
+Recall & 71.57\% & Fraction of attacks detected \\
+F1-score & 0.8214 & Harmonic mean of precision and recall \\
+ROC-AUC & 0.94 & Reported area under the ROC curve \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The reported confusion-matrix values imply 591 attack samples
+($TP+FN$) and 609 normal samples ($FP+TN$). The accuracy is
+\begin{equation}
+\mathrm{Accuracy}=\frac{TP+TN}{TP+TN+FP+FN}
+=\frac{423+593}{1200}\approx0.8467.
+\end{equation}
+Precision is
+\begin{equation}
+\mathrm{Precision}=\frac{TP}{TP+FP}
+=\frac{423}{423+16}\approx0.9636.
+\end{equation}
+Recall is
+\begin{equation}
+\mathrm{Recall}=\frac{TP}{TP+FN}
+=\frac{423}{423+168}\approx0.7157.
+\end{equation}
+The F1-score is
+\begin{equation}
+F_1=2\frac{\mathrm{Precision}\times\mathrm{Recall}}
+{\mathrm{Precision}+\mathrm{Recall}}\approx0.8214.
+\end{equation}
+
+\textbf{Evaluation-split qualification:} the later methodology
+description states that 200 frames were used for calibration and
+the remaining 1,000 frames for evaluation. However, the confusion
+matrix above contains 1,200 classified observations. The group
+must check the CSV or evaluation script and correct either the
+stated split or the reported metric sample count. The 1,000-frame
+and 1,200-frame results must not be merged or presented as one
+experiment.
+
+\section{Interpretation of Detection Performance}
+The earlier and later experiments both report high precision,
+meaning that most flagged samples were labelled as attacks in
+those particular test sets. The later result also reports a
+recall of 71.57\%, indicating that a substantial proportion of
+the attack-labelled observations were not detected. A high
+precision score should therefore not be presented as evidence
+that the detector identifies nearly all attacks.
+
+The reported ROC-AUC of 0.94 suggests that the score used to
+construct the ROC curve provided useful ranking separation in
+the later experiment. This value should be checked against the
+saved ROC output and the exact score used. AUC is not the same
+as accuracy and does not establish performance on unseen field
+data.
+
+\section{Vivado Synthesis Results}
+The latest report draft records zero synthesis errors and
+19 warnings. The resource figures in the available drafts are
+not fully consistent: the earlier report lists 1,381 Slice LUTs,
+while the later report lists 1,193 Slice LUTs. The flip-flop,
+DSP and BRAM figures are consistent in the drafts. Table
+\ref{tab:utilization} therefore records the later value while
+explicitly preserving the discrepancy.
+
+\begin{table}[H]
+\centering
+\caption{Reported synthesis resource utilization for the Artix-7 target.}
+\label{tab:utilization}
+\small
+\begin{tabular}{lrrl}
+\toprule
+Resource & Latest draft value & Earlier draft value & Comment \\
+\midrule
+Slice LUTs & 1,193 & 1,381 & \textbf{Conflicting; verify .rpt} \\
+Slice registers / flip-flops & 647 & 647 & Consistent in drafts \\
+RAMB18E1 primitives & 2 & 2 & Consistent in drafts \\
+DSP48E1 slices & 24 & 24 & Consistent in drafts \\
+CARRY4 & Not stated & 123 & Earlier draft only \\
+BUFG / BUFGCTRL & 1 & 1 & Primitive label needs report check \\
+Bonded IOBs & 572 / 400 & Not stated & Latest draft reports over-utilization \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The LUT figure must be taken from the final Vivado utilization
+report for the exact same project run and top module. Until that
+report is checked, neither 1,193 nor 1,381 should be described
+as definitively authoritative. Similarly, the memory description
+in the draft refers to two RAMB18E1 primitives and one block-RAM
+tile. The exact mapping and any memory-width optimisation should
+be confirmed from the synthesis utilization and messages reports.
+
+% ---------------- NEW: SYNTHESIS DESIGN SCREENSHOTS ----------------
+\section{Synthesis Design Visualisation}
+Figure~\ref{fig:synth_design} shows the synthesised design as
+rendered by Vivado. Figure~\ref{fig:synth_design_2} shows a
+further view of the same elaboration, confirming that the
+principal modules described in Table~\ref{tab:rtlmodules} appear
+in the final netlist.
+
+\reportfigure[0.95\textwidth]{synthesis_design.png}
+{Vivado elaborated synthesis design for
+\texttt{pmu\_anomaly\_top} on the Artix-7 XC7A200T target.}
+{fig:synth_design}
+
+\reportfigure[0.95\textwidth]{synthesis_design_2.png}
+{Further synthesis-design view, showing the module hierarchy and
+interconnect for the Mahalanobis engine and two-sided CUSUM
+datapath.}
+{fig:synth_design_2}
+
+\section{Synthesis Observations}
+The reported synthesis output supports the following limited
+observations:
 \begin{itemize}
-    \item Formulated and mathematically proved the vulnerability of classical $\chi^2$ state estimation to stealth subspace attacks ($a=Hc$).
-    \item Synthesized the complete SystemVerilog RTL on an Artix-7 AC701 FPGA in Vivado v2026.1 with \textbf{0 Errors, 0 Critical Warnings}, utilizing 24 DSPs and 1,381 LUTs.
-    \item Demonstrated line-rate streaming throughput of $2.77\text{ MSamples/sec}$ ($360\text{ ns}$ frame latency at $100\text{ MHz}$).
-    \item Achieved $84.67\%$ Accuracy, $96.36\%$ Precision, and $100\%$ Stealth Attack Detection, dramatically outperforming classical BDD ($59.83\%$ accuracy, $35.3\%$ stealth detection).
+    \item The RTL was accepted by synthesis with zero reported
+    synthesis errors.
+    \item The available report versions indicate 24 DSP48E1
+    slices, suggesting that dedicated DSP resources were inferred.
+    The exact arithmetic-to-resource mapping should be confirmed
+    from the synthesis schematic or utilization details.
+    \item Two RAMB18E1 primitives were reported. The associated
+    state-memory width and depth should be checked against the
+    inferred-memory report.
+    \item The drafts report 647 registers or flip-flops.
+    \item The later draft reports 572 bonded I/O used against
+    400 available in the selected synthesis context. This is an
+    over-utilization condition and must be resolved before
+    implementation on the target package.
+    \item The reports identify an unconnected \texttt{rst\_n}
+    signal on the state-memory module and an unused
+    \texttt{channel\_id\_i[2:0]} input. These warnings require
+    review in the integrated RTL.
+    \item The project notes state that no timing constraint file
+    was found during synthesis. Consequently, no verified
+    clock period, WNS, TNS, hold slack, maximum frequency or
+    power figure is reported here.
 \end{itemize}
 
-\section{Future Work}
-Future extensions will focus on:
+\section{Timing and Power Status}
+Timing closure is a post-synthesis and implementation concern.
+A valid timing analysis requires a clock constraint and any
+necessary input/output delay constraints. The Xilinx constraints
+guide explains the role of timing constraints in defining the
+timing environment for synthesis and implementation
+\cite{ug903}. The synthesis guide also distinguishes synthesis
+from later implementation analysis \cite{ug901}.
+
+The available project records do not provide a verified XDC
+clock constraint, post-implementation timing summary or power
+report. Therefore, the following values are not claimed:
+\begin{itemize}
+    \item worst negative slack (WNS);
+    \item total negative slack (TNS);
+    \item worst hold slack (WHS);
+    \item maximum operating frequency;
+    \item post-route critical-path delay;
+    \item estimated or measured power consumption.
+\end{itemize}
+
+These are missing results, not zero-valued results. A report
+should not write zero for an unmeasured timing or power quantity.
+
+\section{I/O Utilization and Interface Limitation}
+The later synthesis summary records 572 bonded I/O used against
+400 available. This corresponds to
+\begin{equation}
+\mathrm{IO\ Utilization}=\frac{572}{400}\times100\%=143\%.
+\end{equation}
+This indicates that the current top-level port list exceeds the
+reported bonded-I/O capacity in the selected project context.
+It is an interface-level limitation, even though the reported
+logic-resource use is relatively small compared with the device
+capacity.
+
+A practical correction is to reduce the number of exposed
+top-level signals. Instead of exposing every internal feature,
+state bit or intermediate result as a physical port, the design
+can use a narrower streaming interface, serial link, memory-mapped
+bus or suitable board-level interface. The final choice must
+match the available AC701 connectors and the actual board design.
+
+\section{Discussion}
+The Python results indicate that the statistical detector can
+identify a portion of the simulated attack observations. The
+later reported result has high precision but moderate recall,
+so the detector is more conservative in the alarms it raises
+than a perfect attack detector would be. The earlier run reports
+a higher recall and F1-score, but it is a different sample-count
+experiment and should be evaluated independently.
+
+The synthesis results show that the RTL was processed by Vivado
+and mapped to FPGA resources. However, the resource count alone
+does not establish that the design meets a required clock rate.
+The I/O over-utilization, missing timing constraints and
+unconnected/unused signals are important implementation issues.
+The design should therefore be described as a synthesized
+hardware prototype rather than a fully deployed FPGA detector.
+
+% ---------------- VISUAL ANALYSIS ----------------
+\section{Visual Analysis of PMU Telemetry}
+The following plots provide visual evidence of
+the generated measurement sequences, injected attack intervals
+and detector response. Each figure should be generated from the
+same experiment whose metrics are reported in the corresponding
+table.
+
+\reportfigure[0.95\textwidth]{pmu_telemetry_attacks.png}
+{Four-channel PMU telemetry ($V_1$, $V_2$, $P_{12}$ and $Q_{12}$)
+with simulated FDI intervals indicated.}
+{fig:telemetry}
+
+\section{Mahalanobis-Distance Analysis}
+The Mahalanobis-distance plot shows the calculated
+multivariate score and the threshold used to generate the
+spatial anomaly flag. Samples above the threshold are identified
+as spatial anomalies according to Equation~\eqref{eq:mahalflag}.
+
+\reportfigure[0.90\textwidth]{mahalanobis_vs_threshold.png}
+{Mahalanobis-distance trajectory relative to the configured threshold.}
+{fig:mahalanobis}
+
+\section{CUSUM Sequential-Detection Analysis}
+The CUSUM plot shows both positive and negative sequential
+statistics together with the decision threshold. A rising
+positive statistic indicates accumulated evidence of an upward
+shift, while a rising negative statistic indicates accumulated
+evidence of a downward shift.
+
+\reportfigure[0.90\textwidth]{cusum_vs_threshold.png}
+{Positive and negative CUSUM trajectories and the decision threshold.}
+{fig:cusum}
+
+\section{FDI Alarm Response}
+The alarm timeline compares detector outputs with the attack
+labels or attack intervals. It helps identify missed attacks,
+false alarms and the delay between attack onset and detection.
+
+\reportfigure[0.95\textwidth]{fdi_alert_timeline.png}
+{Detector alarm timeline compared with simulated attack intervals.}
+{fig:alarm}
+
+\section{Comparison with Chi-Square Bad-Data Detection}
+The comparison plot uses the same test observations and
+clearly defined labels for each method. A fair comparison
+requires that the threshold-selection process be stated and
+that calibration data is not reused as test data.
+
+\reportfigure[0.95\textwidth]{chi2_vs_mahalanobis_comparison.png}
+{Comparison of the chi-square residual statistic and the proposed
+statistical detector.}
+{fig:chi2}
+
+\section{Receiver Operating Characteristic Analysis}
+The ROC curve plots the true-positive rate against the
+false-positive rate as the decision threshold changes. It
+provides a threshold-independent view of ranking performance.
+The AUC value should be calculated from continuous detector
+scores rather than from a single binary alarm output.
+
+\reportfigure[0.88\textwidth]{roc_curve.png}
+{ROC curve for the proposed detector and any evaluated baselines.}
+{fig:roc}
+
+\section{Detection Delay and Attack Magnitude}
+Detection delay is the interval between the onset of an attack
+and the first valid alarm. The relationship between attack
+magnitude and delay can reveal whether stronger perturbations
+are detected more quickly. The plot must define the unit of
+delay, such as samples or milliseconds.
+
+\reportfigure[0.90\textwidth]{detection_delay_vs_magnitude.png}
+{Detection delay as a function of simulated attack magnitude.}
+{fig:delay}
+
+\section{Average Run Length Trade-off}
+Average Run Length (ARL) describes the expected number of
+samples before an alarm. In-control ARL is evaluated under
+normal operation, while out-of-control ARL is evaluated under
+an attack or process shift. These values require repeated
+simulation or a sufficiently justified statistical estimate.
+
+\reportfigure[0.90\textwidth]{arl_tradeoff_curve.png}
+{ARL trade-off between normal operation and attacked conditions.}
+{fig:arl}
+
+\section{Detection-Latency Distribution}
+The latency CDF shows the fraction of detected events whose
+latency is less than or equal to a given value. The latency
+definition must be stated: software detection delay and
+hardware clock-cycle latency are different quantities and
+must not be presented as interchangeable.
+
+\reportfigure[0.90\textwidth]{latency_cdf.png}
+{Empirical cumulative distribution of the reported detection latency.}
+{fig:latency}
+
+\FloatBarrier
+
+\section{Limitations and Threats to Validity}
+The results should be interpreted in light of the following
+limitations:
 \begin{enumerate}
-    \item Integrating an AXI4-Stream packet parser to ingest standard IEEE C37.118 PMU UDP/IP network packets directly from Gigabit Ethernet.
-    \item Implementing an on-chip recursive Welford covariance update engine to track dynamic grid switching events in real time.
-    \item Tape-out and hardware-in-the-loop (HIL) testing using an OPAL-RT real-time digital power grid simulator.
+    \item \textbf{Synthetic measurements:} the experiment uses
+    simulated IEEE~14-bus-derived data rather than field
+    measurements from an operating utility network.
+    \item \textbf{Attack-model dependence:} detection performance
+    depends on the attack magnitudes, timing, coordination and
+    feature channels selected for the simulation.
+    \item \textbf{Conflicting experiment descriptions:} the
+    1,000-frame and 1,200-frame metric sets must be reconciled
+    with the original evaluation logs.
+    \item \textbf{Calibration split:} the reported 200-frame
+    calibration and 1,000-frame evaluation split conflicts
+    with a confusion matrix containing 1,200 classified
+    observations. The data split must be verified.
+    \item \textbf{LUT-count discrepancy:} the available drafts
+    report both 1,193 and 1,381 LUTs. The final value must be
+    copied from the authoritative Vivado utilization report.
+    \item \textbf{Fixed-point equivalence:} no bit-exact
+    Python-to-RTL comparison is established by the available
+    evidence. Differences in scaling, rounding, saturation
+    and accumulator width may affect the hardware result.
+    \item \textbf{Synthesis only:} synthesis resource estimates
+    do not prove successful placement, routing or timing closure.
+    \item \textbf{I/O over-utilization:} the reported 572/400
+    bonded-I/O demand prevents the current interface from
+    being accepted as a deployable implementation in the
+    reported configuration.
+    \item \textbf{RTL warnings:} the unconnected memory reset
+    and unused channel identifier require investigation.
+    \item \textbf{No board validation:} no verified physical
+    AC701 measurement or hardware-in-the-loop test is claimed.
+    \item \textbf{Single-run uncertainty:} the available metrics
+    do not include confidence intervals across independent
+    random seeds or repeated trials.
 \end{enumerate}
 
-% =============================================================================
-% STATEMENTS AND REFERENCES
-% =============================================================================
-\chapter*{CRediT Author Contribution Statement}
-\addcontentsline{toc}{chapter}{CRediT Author Contribution Statement}
-\begin{itemize}
-    \item \textbf{Member 1 (RUN/CPE/XX/XXXX):} Conceptualization, mathematical derivations, DC state estimation formulation, Python golden reference model.
-    \item \textbf{Member 2 (RUN/CPE/XX/XXXX):} SystemVerilog RTL architecture, FSM controller design, AC701 Vivado synthesis, timing constraint development.
-    \item \textbf{Member 3 (RUN/CPE/XX/XXXX):} Verification lead, standalone testbenches, CSV telemetry generation, analytical plotting scripts, latency evaluation.
-    \item \textbf{Member 4 (RUN/CPE/XX/XXXX):} Literature review, 5-work comparison table, LaTeX document integration, proofreading, reference verification.
-\end{itemize}
+% =====================================================================
+% CHAPTER SIX
+% =====================================================================
+\chapter{Conclusion and Recommendations}
 
-\chapter*{AI Use Disclosure Statement}
-\addcontentsline{toc}{chapter}{AI Use Disclosure Statement}
-In compliance with the CPE 503 course requirements, the authors disclose that artificial intelligence tooling (Google DeepMind Antigravity) was utilized for LaTeX syntax formatting, debugging SystemVerilog package include guards, and drafting boilerplate plotting functions. All mathematical proofs, RTL logic implementations, Vivado synthesis logs, and experimental simulation results were independently derived, verified, and audited by the authors.
+\section{Conclusion}
+This project presented the design and evaluation of a
+hardware-oriented statistical anomaly-detection prototype for
+simulated smart-grid measurement streams. The proposed method
+combines a Mahalanobis-distance test, which evaluates
+multivariate deviations relative to a calibration distribution,
+with a two-sided CUSUM filter, which accumulates evidence of
+persistent changes.
 
-% =============================================================================
-% REFERENCES (>= 30 VERIFIED SCHOLARLY REFERENCES)
-% =============================================================================
+A Python reference model was used to generate four-feature
+IEEE~14-bus-derived telemetry and simulate abrupt, ramp and
+coordinated FDI scenarios. The available project records contain
+two distinct sets of software metrics: an earlier 1,000-frame
+experiment and a later 1,200-observation result. Both are
+documented separately because their sample counts and evaluation
+details have not yet been reconciled.
+
+The SystemVerilog design targets the Artix-7 XC7A200T device
+associated with the AC701 evaluation kit. Vivado synthesis was
+reported to complete with zero errors and 19 warnings. The
+available drafts consistently record 647 registers, 24 DSP48E1
+slices and two RAMB18E1 primitives, but contain conflicting
+LUT counts of 1,193 and 1,381. The latest draft also records
+572 bonded I/O against 400 available, indicating that the
+top-level interface requires restructuring.
+
+The work therefore establishes a Python evaluation and
+synthesis-level hardware prototype. It does not establish
+post-route timing closure, measured power consumption or
+successful physical board operation. These limitations are
+important because a successful synthesis run is only one stage
+of FPGA development.
+
+\section{Recommendations}
+The following improvements are recommended for future work:
+
+\begin{enumerate}
+    \item \textbf{Reconcile the software results.} Re-run the
+    evaluation script from the saved dataset and confirm the
+    number of total frames, calibration frames, test frames,
+    class distribution, confusion matrix, ROC-AUC and all
+    reported metrics.
+
+    \item \textbf{Confirm the authoritative synthesis report.}
+    Open the final Vivado utilization report for the exact
+    project run and top module. Resolve the 1,193 versus
+    1,381 LUT discrepancy and verify the register, DSP,
+    BRAM and I/O counts.
+
+    \item \textbf{Correct the top-level interface.} Reduce
+    the number of exposed physical ports by using a suitable
+    serial, streaming or memory-mapped interface. Re-run
+    synthesis and implementation after the interface has
+    been redesigned.
+
+    \item \textbf{Audit reset and unused signals.} Trace the
+    state-memory reset through the top-level design and
+    determine whether the unconnected reset is intentional
+    or an integration error. Review the unused
+    \texttt{channel\_id\_i[2:0]} signal and either connect
+    it to the intended logic or remove it.
+
+    \item \textbf{Establish bit-exact equivalence.} Build a
+    self-checking testbench that applies identical fixed-point
+    vectors to the Python reference and RTL. Compare
+    intermediate products, accumulated Mahalanobis scores,
+    CUSUM states, saturation behaviour and final alarm flags.
+
+    \item \textbf{Document numerical scaling.} Specify the
+    normalisation formula, Q-format of every signal,
+    multiplication result width, accumulator width,
+    rounding mode and saturation limits. Ensure that
+    physical values outside the Q1.15 range are scaled
+    before encoding.
+
+    \item \textbf{Add timing constraints.} Create an XDC
+    file with the correct primary clock port and clock
+    period. Add input and output delay constraints where
+    required by the selected interface. The clock name
+    and period must match the actual design and intended
+    operating environment.
+
+    \item \textbf{Complete implementation and timing analysis.}
+    Run placement and routing after resolving the I/O
+    issue. Record WNS, TNS, hold slack, critical-path
+    delay and the achieved clock frequency from the
+    post-implementation timing summary.
+
+    \item \textbf{Perform power analysis.} Use the
+    implementation results and appropriate switching
+    activity information to obtain an estimated power
+    report. Clearly distinguish estimated power from
+    direct board measurements.
+
+    \item \textbf{Conduct board-level testing.} After
+    successful implementation, test the design on the
+    AC701 using a documented input/output path. Record
+    the test vectors, clock configuration, observed
+    outputs and any discrepancies against the Python
+    reference.
+
+    \item \textbf{Expand the evaluation.} Test additional
+    random seeds, attack magnitudes, attack durations,
+    noise levels and operating conditions. Report
+    confidence intervals or variability where appropriate.
+
+    \item \textbf{Evaluate additional benchmark cases.}
+    Extend the study to larger power-system test cases
+    and, where possible, field or hardware-in-the-loop
+    measurement data.
+\end{enumerate}
+
+\section{Final Project Status}
+Based on the evidence represented in the available project
+records, the project status is summarised in
+Table~\ref{tab:status}.
+
+\begin{table}[H]
+\centering
+\caption{Project completion and evidence status.}
+\label{tab:status}
+\begin{tabular}{p{5.1cm}p{3.0cm}p{5.0cm}}
+\toprule
+Activity & Status in available records & Evidence / qualification \\
+\midrule
+Python telemetry generation & Reported completed & Synthetic IEEE~14-bus-derived data and attack scenarios.\\
+Python detector evaluation & Reported completed & Two metric sets exist; evaluation split needs reconciliation.\\
+SystemVerilog RTL description & Reported completed & Module inventory and synthesis run are recorded.\\
+Vivado synthesis & Reported completed & Zero errors and 19 warnings reported.\\
+Final LUT count & Requires confirmation & Drafts disagree: 1,193 and 1,381.\\
+I/O feasibility & Not satisfied in reported run & 572 I/O used against 400 available.\\
+Bit-exact Python/RTL verification & Not established & Requires self-checking comparison.\\
+Post-route timing closure & Not established & No verified timing constraints or implementation report.\\
+Power analysis & Not established & No verified power report.\\
+Physical AC701 testing & Not established & No verified board-level evidence.\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The project provides a useful foundation for continued work on
+hardware-based statistical monitoring of smart-grid measurements.
+Its next engineering milestone is not to claim deployment, but
+to reconcile the experimental records, correct the interface,
+verify numerical equivalence and complete constrained FPGA
+implementation.
+
+% =====================================================================
+% REFERENCES
+% =====================================================================
 \begin{thebibliography}{99}
-\addcontentsline{toc}{chapter}{References}
-
-\bibitem{liu2009}
-Y.~Liu, P.~Ning, and M.~K.~Reiter, ``False data injection attacks against state estimation in electric power grids,'' \textit{ACM Transactions on Information and System Security}, vol.~14, no.~1, pp.~13:1--13:33, 2011.
-
-\bibitem{page1954}
-E.~S.~Page, ``Continuous inspection schemes,'' \textit{Biometrika}, vol.~41, no.~1/2, pp.~100--115, 1954.
-
-\bibitem{abur2004}
-A.~Abur and A.~G.~Exp\'{o}sito, \textit{Power System State Estimation: Theory and Implementation}, Marcel Dekker, New York, NY, 2004.
-
-\bibitem{zimmerman2011}
-R.~D.~Zimmerman, C.~E.~Murillo-S\'{a}nchez, and R.~J.~Thomas, ``MATPOWER: Steady-state operations, planning, and analysis tools for power systems research and education,'' \textit{IEEE Transactions on Power Systems}, vol.~26, no.~1, pp.~12--19, 2011.
-
-\bibitem{schweppe1970}
-F.~C.~Schweppe and J.~Wildes, ``Power system static-state estimation, Part I: Exact model,'' \textit{IEEE Transactions on Power Apparatus and Systems}, vol.~PAS-89, no.~1, pp.~120--125, 1970.
-
-\bibitem{ieee_c37118}
-IEEE Standard for Synchrophasor Measurements for Power Systems, \textit{IEEE Std C37.118.1-2011 (Revision of IEEE Std C37.118-2005)}, pp.~1--61, Dec. 2011.
 
 \bibitem{mahalanobis1936}
-P.~C.~Mahalanobis, ``On the generalized distance in statistics,'' \textit{Proceedings of the National Institute of Sciences of India}, vol.~2, no.~1, pp.~49--55, 1936.
+P. C. Mahalanobis,
+``On the generalized distance in statistics,''
+\textit{Proceedings of the National Institute of Sciences of India},
+vol. 2, no. 1, pp. 49--55, 1936.
 
-\bibitem{lorden1971}
-G.~Lorden, ``Procedures for reacting to a change in distribution,'' \textit{The Annals of Mathematical Statistics}, vol.~42, no.~6, pp.~1897--1908, 1971.
+\bibitem{page1954}
+E. S. Page,
+``Continuous inspection schemes,''
+\textit{Biometrika}, vol. 41, nos. 1--2, pp. 100--115, 1954,
+doi: 10.1093/biomet/41.1-2.100.
 
-\bibitem{moustakides1986}
-G.~V.~Moustakides, ``Optimal stopping times for detecting changes in distributions,'' \textit{The Annals of Statistics}, vol.~14, no.~4, pp.~1379--1387, 1986.
+\bibitem{liu2009}
+Y. Liu, P. Ning, and M. K. Reiter,
+``False data injection attacks against state estimation in electric
+power grids,''
+in \textit{Proceedings of the 16th ACM Conference on Computer and
+Communications Security}, 2009, pp. 21--32,
+doi: 10.1145/1653662.1653666.
 
-\bibitem{liang2017}
-G.~Liang, S.~R.~Weller, J.~Zhao, F.~Luo, and Z.~Y.~Dong, ``The 2015 Ukraine blackout: Implications for false data injection attacks,'' \textit{IEEE Transactions on Power Systems}, vol.~32, no.~4, pp.~3317--3318, 2017.
+\bibitem{liu2011}
+Y. Liu, P. Ning, and M. K. Reiter,
+``False data injection attacks against state estimation in electric
+power grids,''
+\textit{ACM Transactions on Information and System Security},
+vol. 14, no. 1, 2011,
+doi: 10.1145/1952982.1952995.
 
-\bibitem{rahman2012}
-M.~A.~Rahman and H.~Mohsenian-Rad, ``False data injection attacks against financial dispatch in electricity markets,'' in \textit{Proc. IEEE PES Innovative Smart Grid Technologies (ISGT)}, pp.~1--6, 2012.
+\bibitem{abur2004}
+A. Abur and A. G. Exposito,
+\textit{Power System State Estimation: Theory and Implementation}.
+New York: Marcel Dekker, 2004.
 
-\bibitem{kurt2019}
-M.~N.~Kurt, O.~Yagan, and X.~Wang, ``Real-time detection of false data injection attacks on power grid state estimation,'' \textit{IEEE Transactions on Information Forensics and Security}, vol.~14, no.~2, pp.~498--513, 2019.
+\bibitem{zimmerman2011}
+R. D. Zimmerman, C. E. Murillo-Sanchez, and R. J. Thomas,
+``MATPOWER: Steady-state operations, planning, and analysis tools
+for power systems research and education,''
+\textit{IEEE Transactions on Power Systems},
+vol. 26, no. 1, pp. 12--19, 2011,
+doi: 10.1109/TPWRS.2010.2051168.
 
-\bibitem{khan2021}
-A.~Khan, M.~A.~Mustafa, and N.~Guan, ``FPGA-based hardware accelerator for SVM-based smart grid cyber-attack detection,'' \textit{IEEE Embedded Systems Letters}, vol.~13, no.~3, pp.~97--100, 2021.
+\bibitem{huang2016}
+Y. Huang, M. Esmalifalak, H. Nguyen, R. Zheng, Z. Han,
+H. Li, and L. Song,
+``Real-time detection of false data injection in smart grid networks:
+An adaptive CUSUM method and analysis,''
+\textit{IEEE Systems Journal}, vol. 10, no. 2,
+pp. 532--543, 2016,
+doi: 10.1109/JSYST.2014.2323266.
 
-\bibitem{alabassi2022}
-A.~Al-Abassi, H.~Karimipour, and A.~Dehghantanha, ``An ensemble deep learning-based cyber-attack detection in smart grid IoT networks,'' \textit{IEEE Transactions on Industrial Informatics}, vol.~18, no.~12, pp.~8854--8862, 2022.
+\bibitem{nist7628}
+National Institute of Standards and Technology,
+\textit{Guidelines for Smart Grid Cybersecurity},
+NISTIR 7628, 2010.
 
-\bibitem{chen2023}
-Y.~Chen, S.~Tan, and L.~Shen, ``Hardware acceleration of Mahalanobis distance anomaly detector for synchrophasor networks,'' \textit{IEEE Transactions on Industrial Electronics}, vol.~70, no.~8, pp.~8411--8421, 2023.
+\bibitem{nist7628r1}
+National Institute of Standards and Technology,
+\textit{Guidelines for Smart Grid Cybersecurity: Vol. 1,
+Smart Grid Cybersecurity Strategy, Architecture, and High-Level
+Requirements},
+NISTIR 7628 Revision 1, 2014.
 
-\bibitem{huang2019}
-Y.~Huang, J.~Tang, and K.~A.~Loparo, ``State estimation cyber-attacks: Detection and mitigation in smart grids,'' \textit{IEEE Transactions on Smart Grid}, vol.~10, no.~4, pp.~4432--4441, 2019.
+\bibitem{ieeeC37118}
+IEEE,
+\textit{IEEE Standard for Synchrophasor Measurements for Power Systems},
+IEEE Std C37.118.1-2011, 2011.
 
-\bibitem{gu2017}
-H.~Gu, R.~Guo, and J.~Yao, ``A spatial-temporal anomaly detection engine for synchrophasor systems based on CUSUM,'' \textit{IEEE Access}, vol.~5, pp.~18234--18244, 2017.
+\bibitem{iec60255}
+IEC/IEEE,
+\textit{Measuring Relays and Protection Equipment -- Part 118-1:
+Synchrophasor for Power Systems -- Measurements},
+IEC/IEEE 60255-118-1:2018, 2018.
 
-\bibitem{duddu2021}
-V.~Duddu and D.~V.~Rao, ``Hardware security of edge devices: Attacks, countermeasures, and open challenges,'' \textit{ACM Computing Surveys}, vol.~54, no.~9, pp.~1--37, 2021.
+\bibitem{artix7ds}
+AMD Xilinx,
+\textit{7 Series FPGAs Data Sheet: Overview},
+DS180, product documentation.
 
-\bibitem{yang2021}
-L.~Yang, Y.~Zhang, and P.~Wang, ``Robust bad data detection in smart grids under cyber-attacks: A geometric approach,'' \textit{IEEE Transactions on Cybernetics}, vol.~51, no.~10, pp.~4821--4832, 2021.
+\bibitem{ug901}
+AMD Xilinx,
+\textit{Vivado Design Suite User Guide: Synthesis},
+UG901, 2026.1 documentation.
 
-\bibitem{wang2022}
-S.~Wang, S.~Bi, and Y.~Zhang, ``Reinforcement learning for real-time false data injection attack detection in smart grids,'' \textit{IEEE Transactions on Smart Grid}, vol.~13, no.~1, pp.~567--578, 2022.
+\bibitem{ug903}
+AMD Xilinx,
+\textit{Vivado Design Suite User Guide: Using Constraints},
+UG903, 2026.1 documentation.
 
-\bibitem{musleh2023}
-A.~S.~Musleh, G.~Chen, and Z.~Y.~Dong, ``A survey on cyber-attacks to smart grid state estimation: Attack models and defense mechanisms,'' \textit{IEEE Systems Journal}, vol.~17, no.~2, pp.~2489--2502, 2023.
+\bibitem{ug907}
+AMD Xilinx,
+\textit{Vivado Design Suite User Guide: Power Analysis and Optimization},
+UG907, 2026.1 documentation.
 
-\bibitem{kumar2023}
-R.~Kumar, P.~Rocchetti, and S.~Sahoo, ``FPGA-in-the-loop validation of resilient state estimation under sensor spoofing attacks,'' \textit{IEEE Transactions on Industrial Electronics}, vol.~70, no.~11, pp.~11654--11664, 2023.
+\bibitem{matpowercase14}
+MATPOWER,
+``case14: IEEE 14-bus test case,''
+MATPOWER documentation, available at
+\url{https://matpower.org/}.
 
-\bibitem{tang2024}
-J.~Tang, K.~Sun, and F.~Liu, ``Physics-informed statistical detectors for stealthy cyber-attacks in synchrophasor networks,'' \textit{IEEE Transactions on Power Delivery}, vol.~39, no.~1, pp.~214--225, 2024.
+\bibitem{nist80082}
+National Institute of Standards and Technology,
+\textit{Guide to Industrial Control Systems (ICS) Security},
+NIST Special Publication 800-82, 2011.
 
-\bibitem{adebayo2024}
-O.~Adebayo, M.~Ojo, and B.~Adegoke, ``Hardware-efficient architectures for embedded anomaly detection in cyber-physical systems,'' \textit{Journal of Computer Engineering and Technology}, vol.~12, no.~2, pp.~89--104, 2024.
+\bibitem{montgomery2019}
+D. C. Montgomery,
+\textit{Introduction to Statistical Quality Control},
+8th ed. Hoboken, NJ: Wiley, 2019.
 
-\bibitem{xilinx_ug952}
-AMD Xilinx, \textit{AC701 Evaluation Board User Guide (UG952)}, v1.5, AMD Xilinx Inc., San Jose, CA, 2021.
+\bibitem{ross2014}
+S. M. Ross,
+\textit{Introduction to Probability Models},
+11th ed. Amsterdam: Academic Press, 2014.
 
-\bibitem{xilinx_ug473}
-AMD Xilinx, \textit{7 Series FPGAs Memory Resources User Guide (UG473)}, v1.14, AMD Xilinx Inc., San Jose, CA, 2022.
-
-\bibitem{xilinx_ug479}
-AMD Xilinx, \textit{7 Series DSP48E1 Slice User Guide (UG479)}, v1.10, AMD Xilinx Inc., San Jose, CA, 2020.
-
-\bibitem{nist_sp80082}
-K.~Stouffer, V.~Pillitteri, S.~Lightman, M.~Abrams, and A.~Hahn, ``Guide to industrial control systems (ICS) security,'' \textit{NIST Special Publication 800-82, Rev. 3}, National Institute of Standards and Technology, Gaithersburg, MD, 2023.
-
-\bibitem{iso_iec_27019}
-ISO/IEC Standard, ``Information technology --- Security techniques --- Information security controls for the energy utility industry,'' \textit{ISO/IEC Std 27019:2017}, International Organization for Standardization, Geneva, Switzerland, 2017.
-
-\bibitem{kosut2011}
-O.~Kosut, L.~Jia, R.~J.~Thomas, and L.~Tong, ``Malicious data attacks on the smart grid: Attack craft and countermeasures,'' \textit{IEEE Transactions on Smart Grid}, vol.~2, no.~4, pp.~645--658, 2011.
-
-\bibitem{cui2020}
-Y.~Cui, J.~Hao, and Q.~Li, ``A survey of false data injection attacks in smart grid: Attacks and defenses,'' \textit{IEEE Internet of Things Journal}, vol.~7, no.~9, pp.~8133--8145, 2020.
+\bibitem{ieee1547}
+IEEE,
+\textit{IEEE Standard for Interconnection and Interoperability of
+Distributed Energy Resources with Associated Electric Power Systems
+Interfaces},
+IEEE Std 1547-2018, 2018.
 
 \end{thebibliography}
+
+% =====================================================================
+% APPENDICES
+% =====================================================================
+\appendix
+
+\chapter{Reproducibility and Evidence Checklist}
+
+The following checklist identifies the evidence that should be
+retained with the final project submission. It is included to
+support reproducibility and to make it possible to trace reported
+numbers to the original tools and files.
+
+\begin{longtable}{p{0.7cm}p{6.2cm}p{6.0cm}}
+\caption{Recommended reproducibility package.}
+\label{tab:reproducibility}\\
+\toprule
+No. & Item & Required contents \\
+\midrule
+\endfirsthead
+\toprule
+No. & Item & Required contents \\
+\midrule
+\endhead
+1 & Python source code & Data generation, preprocessing, calibration, detector and evaluation scripts.\\
+2 & Dataset metadata & Dataset source, case configuration, feature definitions, sample count and units.\\
+3 & Random seeds & Seeds used for normal-data generation and attack injection.\\
+4 & Evaluation CSV & Per-frame labels, detector scores, binary predictions and timestamps or sample indices.\\
+5 & Metric output & Confusion matrix, accuracy, precision, recall, F1, FPR and ROC-AUC (see \texttt{evaluation\_metrics.json}).\\
+6 & Plot files & All figures used in the report, generated from the documented run.\\
+7 & RTL source & Final SystemVerilog files and shared packages.\\
+8 & Testbench & Stimulus, expected outputs, assertions and simulation transcript.\\
+9 & Fixed-point specification & Q-format, scaling, rounding, saturation and accumulator widths.\\
+10 & Vivado project & Project settings, selected part, source files and run configuration.\\
+11 & Synthesis reports & Utilization, messages, inferred memories and synthesis summary.\\
+12 & XDC constraints & Clock definition and applicable input/output timing constraints.\\
+13 & Implementation reports & Placement, routing, timing summary and power report, when completed.\\
+14 & Board test log & Board setup, clock, input vectors, observed outputs and comparison results.\\
+\bottomrule
+\end{longtable}
+
+\chapter{Suggested Vivado Timing-Constraint Template}
+The following is a template only. The clock port name and period
+must be replaced with the actual top-level clock port and the
+intended operating frequency. It must not be copied unchanged
+if the design uses a different port name.
+
+\begin{lstlisting}[language=tcl,caption={Illustrative XDC primary-clock constraint.}]
+# Replace clk_i with the actual top-level clock port.
+# Replace 10.000 with the required clock period in nanoseconds.
+create_clock -name sys_clk -period 10.000 [get_ports {clk_i}]
+\end{lstlisting}
+
+Input and output delay constraints should be added when the
+interface timing requirements are known. The constraints must
+reflect the actual source and destination devices and the
+board-level timing environment.
+
+\chapter{Final Pre-Submission Audit}
+Before exporting the final PDF, the group should:
+\begin{enumerate}
+    \item confirm the four member names and matriculation numbers;
+    \item confirm that every cited source appears in the references;
+    \item upload the generated figure files into the \texttt{results}
+    directory, using the exact filenames listed at the top of
+    Chapter~5, or edit the corresponding \texttt{\textbackslash reportfigure}
+    calls;
+    \item reconcile the two Python experiment descriptions;
+    \item reconcile the LUT count using the final Vivado report;
+    \item verify the fixed-point scaling against the RTL;
+    \item ensure that the report does not claim unperformed
+    implementation, timing, power or board tests;
+    \item compile the document twice and inspect the table of
+    contents, figures, tables and page breaks.
+\end{enumerate}
 
 \end{document}

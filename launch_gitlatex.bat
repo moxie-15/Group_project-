@@ -18,3 +18,4 @@ echo ===========================================================================
 echo.
 python -m gitlatex --repos "%USERPROFILE%\Desktop\latex_repos" --port 5000
 pause
+
