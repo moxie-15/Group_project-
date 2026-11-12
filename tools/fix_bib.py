@@ -27,3 +27,4 @@ with open('chapter_six_and_backmatter_generator.py', 'w', encoding='utf-8') as f
     f.write(text)
 
 print("Fixed bibliography in chapter_six_and_backmatter_generator.py")
+

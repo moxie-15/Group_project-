@@ -78,3 +78,4 @@ with open('report_generator_parts.py', 'w', encoding='utf-8') as f:
     f.write(rf)
 
 print("Page budget adjustments applied.")
+

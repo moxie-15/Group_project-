@@ -42,6 +42,7 @@ def get_preamble():
 \setlength{\headheight}{15pt}
 \setlength{\parindent}{0.35in}
 \setlength{\parskip}{0pt}
+\renewcommand{\bibname}{References}
 
 
 

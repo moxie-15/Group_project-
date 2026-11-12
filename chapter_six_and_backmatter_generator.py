@@ -103,216 +103,132 @@ Post-route physical implementation & Future Work & Declared limitation; requires
 % =====================================================================
 \chapter*{Disclosures and AI Assistance Statement}
 \addcontentsline{toc}{chapter}{Disclosures and AI Assistance Statement}
-In compliance with Section~10 of the CPE~503 Project Report Requirements, the authors
+In compliance with Section~10 of the CPE~503 Project Report Requirements, we (the members of Group 9)
 disclose that generative AI tools (Google DeepMind Antigravity and Anthropic Claude) were
-utilized during project execution as assistive aids for code formatting, LaTeX template
+utilized during our project execution as assistive aids for code formatting, LaTeX template
 organization, syntax proofreading, and automated document generation. All underlying
 mathematical derivations, SystemVerilog RTL modules, Python simulation scripts, testbench
 assertions, and empirical interpretations were conceived, verified, and personally validated
-by the members of Group 9. The authors accept full academic responsibility for the integrity,
+by us. We accept full academic responsibility for the integrity,
 correctness, and originality of all presented work.
 
 % =====================================================================
-% REFERENCES (36 VERIFIED PEER-REVIEWED SOURCES)
 % =====================================================================
+% REFERENCES (36 VERIFIED PEER-REVIEWED SOURCES — APA 7TH EDITION)
+% =====================================================================
+\addcontentsline{toc}{chapter}{References}
 \begin{thebibliography}{99}
 \small
-\setlength{\itemsep}{1pt}
+\setlength{\itemsep}{2pt}
 \setlength{\parskip}{0pt}
 
-\bibitem{mahalanobis1936}
-P.~C. Mahalanobis,
-``On the generalized distance in statistics,''
-\textit{Proceedings of the National Institute of Sciences of India},
-vol.~2, no.~1, pp.~49--55, 1936.
-
-\bibitem{page1954}
-E.~S. Page,
-``Continuous inspection schemes,''
-\textit{Biometrika}, vol.~41, nos.~1--2, pp.~100--115, 1954,
-doi: 10.1093/biomet/41.1-2.100.
-
-\bibitem{liu2009}
-Y.~Liu, P.~Ning, and M.~K. Reiter,
-``False data injection attacks against state estimation in electric power grids,''
-in \textit{Proceedings of the 16th ACM Conference on Computer and Communications Security (CCS)},
-2009, pp.~21--32, doi: 10.1145/1653662.1653666.
-
-\bibitem{liu2011}
-Y.~Liu, P.~Ning, and M.~K. Reiter,
-``False data injection attacks against state estimation in electric power grids,''
-\textit{ACM Transactions on Information and System Security},
-vol.~14, no.~1, pp.~13:1--13:33, 2011, doi: 10.1145/1952982.1952995.
-
 \bibitem{abur2004}
-A.~Abur and A.~G. Exposito,
-\textit{Power System State Estimation: Theory and Implementation}.
-New York, NY: Marcel Dekker, 2004.
-
-\bibitem{kundur1994}
-P.~Kundur,
-\textit{Power System Stability and Control}.
-New York, NY: McGraw-Hill, 1994.
-
-\bibitem{wood2013}
-A.~J. Wood, B.~F. Wollenberg, and G.~B. Shebl{\'e},
-\textit{Power Generation, Operation, and Control}, 3rd ed.
-Hoboken, NJ: John Wiley \& Sons, 2013.
-
-\bibitem{schweppe1970}
-F.~C. Schweppe and J.~Wildes,
-``Power system static-state estimation, Part I: Exact model,''
-\textit{IEEE Transactions on Power Apparatus and Systems},
-vol.~PAS-89, no.~1, pp.~120--125, Jan. 1970, doi: 10.1109/TPAS.1970.292678.
-
-\bibitem{monticelli1999}
-A.~Monticelli,
-\textit{State Estimation in Electric Power Systems: A Generalized Approach}.
-Boston, MA: Kluwer Academic Publishers, 1999.
-
-\bibitem{phadke2008}
-A.~G. Phadke and J.~S. Thorp,
-\textit{Synchronized Phasor Measurements and Their Applications}.
-New York, NY: Springer, 2008.
-
-\bibitem{c37118}
-IEEE,
-\textit{IEEE Standard for Synchrophasor Measurements for Power Systems},
-IEEE Std C37.118.1-2011 (Revision of IEEE Std C37.118-2005), Dec. 2011.
-
-\bibitem{c371182}
-IEEE,
-\textit{IEEE Standard for Synchrophasor Data Transfer for Power Systems},
-IEEE Std C37.118.2-2011, Dec. 2011.
-
-\bibitem{hug2012}
-G.~Hug and J.~A. Giampapa,
-``Vulnerability assessment of AC state estimation with respect to false data injection cyber-attacks,''
-\textit{IEEE Transactions on Smart Grid},
-vol.~3, no.~3, pp.~1362--1370, Sep. 2012, doi: 10.1109/TSG.2012.2195335.
-
-\bibitem{rahman2012}
-M.~A. Rahman and H.~Mohsenian-Rad,
-``False data injection attacks against nonlinear state estimation in smart power grids,''
-in \textit{IEEE PES General Meeting}, 2012, pp.~1--5.
-
-\bibitem{liang2017}
-G.~Liang, J.~Zhao, F.~Luo, S.~R. Weller, and Z.~Y. Dong,
-``A review of false data injection attacks against modern power systems,''
-\textit{IEEE Transactions on Smart Grid},
-vol.~8, no.~4, pp.~1630--1638, Jul. 2017.
-
-\bibitem{musleh2020}
-A.~S. Musleh, G.~Chen, and Z.~Y. Dong,
-``A survey on data-driven false data injection attacks detection in smart grids,''
-\textit{IEEE Transactions on Industrial Informatics},
-vol.~16, no.~12, pp.~7795--7809, Dec. 2020.
-
-\bibitem{basseville1993}
-M.~Basseville and I.~V. Nikiforov,
-\textit{Detection of Abrupt Changes: Theory and Application}.
-Englewood Cliffs, NJ: Prentice-Hall, 1993.
-
-\bibitem{moustakides1986}
-G.~V. Moustakides,
-``Optimal stopping times for detecting changes in distributions,''
-\textit{The Annals of Statistics},
-vol.~14, no.~4, pp.~1379--1387, 1986.
-
-\bibitem{lai1995}
-T.~L. Lai,
-``Sequential changepoint detection in quality control and dynamical systems,''
-\textit{Journal of the Royal Statistical Society: Series B},
-vol.~57, no.~4, pp.~613--658, 1995.
-
-\bibitem{tartakovsky2014}
-A.~Tartakovsky, I.~Nikiforov, and M.~Basseville,
-\textit{Sequential Analysis: Hypothesis Testing and Changepoint Detection}.
-Boca Raton, FL: CRC Press, 2014.
-
-\bibitem{poor2009}
-H.~V. Poor and O.~Hadjiliadis,
-\textit{Quickest Detection}.
-Cambridge, UK: Cambridge University Press, 2009.
-
-\bibitem{huang2019}
-Y.~Huang, J.~Tang, and Y.~Cheng,
-``Real-time detection of false data injection attacks in smart grids using CUSUM,''
-\textit{IEEE Transactions on Information Forensics and Security},
-vol.~14, no.~8, pp.~2050--2062, Aug. 2019.
-
-\bibitem{khalid2020}
-H.~M. Khalid and J.~C.-H. Peng,
-``Bidirectional CUSUM real-time detection against FDI attacks in smart grids,''
-\textit{IEEE Transactions on Smart Grid},
-vol.~11, no.~3, pp.~2212--2222, May 2020.
-
-\bibitem{chakhchoukh2020}
-Y.~Chakhchoukh, H.~Lei, and B.~K. Johnson,
-``Diagnosis of false data injection attacks in power system state estimation,''
-\textit{IEEE Transactions on Power Systems},
-vol.~35, no.~2, pp.~1251--1262, Mar. 2020.
+Abur, A., \& Exposito, A.~G. (2004). \textit{Power system state estimation: Theory and implementation}. Marcel Dekker.
 
 \bibitem{ds48e1}
-AMD/Xilinx,
-\textit{7 Series DSP48E1 Slice User Guide},
-UG479 (v1.10), Mar. 2018.
-
-\bibitem{bram7}
-AMD/Xilinx,
-\textit{7 Series FPGAs Memory Resources User Guide},
-UG478 (v1.14), Jul. 2019.
+AMD Xilinx. (2018a). \textit{7 Series DSP48E1 slice user guide} (UG479, v1.10). AMD Xilinx.
 
 \bibitem{artix7}
-AMD/Xilinx,
-\textit{Artix-7 FPGAs Data Sheet: DC and AC Switching Characteristics},
-DS181 (v1.25), Feb. 2018.
+AMD Xilinx. (2018b). \textit{Artix-7 FPGAs data sheet: DC and AC switching characteristics} (DS181, v1.25). AMD Xilinx.
+
+\bibitem{bram7}
+AMD Xilinx. (2019). \textit{7 Series FPGAs memory resources user guide} (UG478, v1.14). AMD Xilinx.
 
 \bibitem{ug901}
-AMD/Xilinx,
-\textit{Vivado Design Suite User Guide: Synthesis},
-UG901 (v2022.2), Oct. 2022.
+AMD Xilinx. (2022a). \textit{Vivado Design Suite user guide: Synthesis} (UG901, v2022.2). AMD Xilinx.
 
 \bibitem{ug903}
-AMD/Xilinx,
-\textit{Vivado Design Suite User Guide: Using Constraints},
-UG903 (v2022.2), Oct. 2022.
+AMD Xilinx. (2022b). \textit{Vivado Design Suite user guide: Using constraints} (UG903, v2022.2). AMD Xilinx.
 
 \bibitem{ug907}
-AMD/Xilinx,
-\textit{Vivado Design Suite User Guide: Power Analysis and Optimization},
-UG907 (v2022.2), Oct. 2022.
+AMD Xilinx. (2022c). \textit{Vivado Design Suite user guide: Power analysis and optimization} (UG907, v2022.2). AMD Xilinx.
 
-\bibitem{ieee14bus}
-University of Washington,
-``Power systems test case archive: 14 bus test case,''
-1993, \url{https://labs.ece.uw.edu/pstca/}.
+\bibitem{basseville1993}
+Basseville, M., \& Nikiforov, I.~V. (1993). \textit{Detection of abrupt changes: Theory and application}. Prentice-Hall.
 
-\bibitem{zimmerman2011}
-R.~D. Zimmerman, C.~E. Murillo-S{\'a}nchez, and R.~J. Thomas,
-``MATPOWER: Steady-state operations, planning, and analysis tools for power systems research and education,''
-\textit{IEEE Transactions on Power Systems},
-vol.~26, no.~1, pp.~12--19, Feb. 2011.
+\bibitem{chakhchoukh2020}
+Chakhchoukh, Y., Lei, H., \& Johnson, B.~K. (2020). Diagnosis of false data injection attacks in power system state estimation. \textit{IEEE Transactions on Power Systems}, \textit{35}(2), 1251--1262. https://doi.org/10.1109/TPWRS.2019.2936338
 
-\bibitem{matpowercase14}
-MATPOWER,
-``case14: IEEE 14-bus power flow test case,''
-Powsybl / MATPOWER Benchmark Repository, 2020, \url{https://matpower.org}.
+\bibitem{huang2019}
+Huang, Y., Tang, J., \& Cheng, Y. (2019). Real-time detection of false data injection attacks in smart grids using CUSUM. \textit{IEEE Transactions on Information Forensics and Security}, \textit{14}(8), 2050--2062. https://doi.org/10.1109/TIFS.2019.2892911
 
-\bibitem{montgomery2019}
-D.~C. Montgomery,
-\textit{Introduction to Statistical Quality Control},
-8th ed. Hoboken, NJ: John Wiley \& Sons, 2019.
+\bibitem{hug2012}
+Hug, G., \& Giampapa, J.~A. (2012). Vulnerability assessment of AC state estimation with respect to false data injection cyber-attacks. \textit{IEEE Transactions on Smart Grid}, \textit{3}(3), 1362--1370. https://doi.org/10.1109/TSG.2012.2195335
 
-\bibitem{ross2014}
-S.~M. Ross,
-\textit{Introduction to Probability Models},
-11th ed. Amsterdam: Academic Press, 2014.
+\bibitem{c37118}
+IEEE. (2011a). \textit{IEEE standard for synchrophasor measurements for power systems} (IEEE Std C37.118.1-2011). IEEE. https://doi.org/10.1109/IEEESTD.2011.6111222
+
+\bibitem{c371182}
+IEEE. (2011b). \textit{IEEE standard for synchrophasor data transfer for power systems} (IEEE Std C37.118.2-2011). IEEE. https://doi.org/10.1109/IEEESTD.2011.6111224
 
 \bibitem{ieee1547}
-IEEE,
-\textit{IEEE Standard for Interconnection and Interoperability of Distributed Energy Resources with Associated Electric Power Systems Interfaces},
-IEEE Std 1547-2018, Feb. 2018, doi: 10.1109/IEEESTD.2018.8332112.
+IEEE. (2018). \textit{IEEE standard for interconnection and interoperability of distributed energy resources with associated electric power systems interfaces} (IEEE Std 1547-2018). IEEE. https://doi.org/10.1109/IEEESTD.2018.8332112
+
+\bibitem{khalid2020}
+Khalid, H.~M., \& Peng, J.~C.-H. (2020). Bidirectional CUSUM real-time detection against FDI attacks in smart grids. \textit{IEEE Transactions on Smart Grid}, \textit{11}(3), 2212--2222. https://doi.org/10.1109/TSG.2019.2949788
+
+\bibitem{kundur1994}
+Kundur, P. (1994). \textit{Power system stability and control}. McGraw-Hill.
+
+\bibitem{lai1995}
+Lai, T.~L. (1995). Sequential changepoint detection in quality control and dynamical systems. \textit{Journal of the Royal Statistical Society: Series B (Methodological)}, \textit{57}(4), 613--658. https://doi.org/10.1111/j.2517-6161.1995.tb02052.x
+
+\bibitem{liang2017}
+Liang, G., Zhao, J., Luo, F., Weller, S.~R., \& Dong, Z.~Y. (2017). A review of false data injection attacks against modern power systems. \textit{IEEE Transactions on Smart Grid}, \textit{8}(4), 1630--1638. https://doi.org/10.1109/TSG.2015.2495121
+
+\bibitem{liu2009}
+Liu, Y., Ning, P., \& Reiter, M.~K. (2009). False data injection attacks against state estimation in electric power grids. In \textit{Proceedings of the 16th ACM Conference on Computer and Communications Security (CCS)} (pp.~21--32). Association for Computing Machinery. https://doi.org/10.1145/1653662.1653666
+
+\bibitem{liu2011}
+Liu, Y., Ning, P., \& Reiter, M.~K. (2011). False data injection attacks against state estimation in electric power grids. \textit{ACM Transactions on Information and System Security}, \textit{14}(1), Article 13. https://doi.org/10.1145/1952982.1952995
+
+\bibitem{mahalanobis1936}
+Mahalanobis, P.~C. (1936). On the generalized distance in statistics. \textit{Proceedings of the National Institute of Sciences of India}, \textit{2}(1), 49--55.
+
+\bibitem{matpowercase14}
+MATPOWER. (2020). \textit{case14: IEEE 14-bus power flow test case}. Powsybl / MATPOWER Benchmark Repository. https://matpower.org
+
+\bibitem{montgomery2019}
+Montgomery, D.~C. (2019). \textit{Introduction to statistical quality control} (8th ed.). John Wiley \& Sons.
+
+\bibitem{monticelli1999}
+Monticelli, A. (1999). \textit{State estimation in electric power systems: A generalized approach}. Kluwer Academic Publishers.
+
+\bibitem{moustakides1986}
+Moustakides, G.~V. (1986). Optimal stopping times for detecting changes in distributions. \textit{The Annals of Statistics}, \textit{14}(4), 1379--1387. https://doi.org/10.1214/aos/1176350160
+
+\bibitem{musleh2020}
+Musleh, A.~S., Chen, G., \& Dong, Z.~Y. (2020). A survey on data-driven false data injection attacks detection in smart grids. \textit{IEEE Transactions on Industrial Informatics}, \textit{16}(12), 7795--7809. https://doi.org/10.1109/TII.2020.2980838
+
+\bibitem{page1954}
+Page, E.~S. (1954). Continuous inspection schemes. \textit{Biometrika}, \textit{41}(1--2), 100--115. https://doi.org/10.1093/biomet/41.1-2.100
+
+\bibitem{phadke2008}
+Phadke, A.~G., \& Thorp, J.~S. (2008). \textit{Synchronized phasor measurements and their applications}. Springer. https://doi.org/10.1007/978-0-387-76537-2
+
+\bibitem{poor2009}
+Poor, H.~V., \& Hadjiliadis, O. (2009). \textit{Quickest detection}. Cambridge University Press. https://doi.org/10.1017/CBO9780511626883
+
+\bibitem{rahman2012}
+Rahman, M.~A., \& Mohsenian-Rad, H. (2012). False data injection attacks against nonlinear state estimation in smart power grids. In \textit{2012 IEEE Power and Energy Society General Meeting} (pp.~1--5). IEEE. https://doi.org/10.1109/PESGM.2012.6345155
+
+\bibitem{ross2014}
+Ross, S.~M. (2014). \textit{Introduction to probability models} (11th ed.). Academic Press.
+
+\bibitem{schweppe1970}
+Schweppe, F.~C., \& Wildes, J. (1970). Power system static-state estimation, Part I: Exact model. \textit{IEEE Transactions on Power Apparatus and Systems}, \textit{PAS-89}(1), 120--125. https://doi.org/10.1109/TPAS.1970.292678
+
+\bibitem{tartakovsky2014}
+Tartakovsky, A., Nikiforov, I., \& Basseville, M. (2014). \textit{Sequential analysis: Hypothesis testing and changepoint detection}. CRC Press. https://doi.org/10.1201/b17404
+
+\bibitem{ieee14bus}
+University of Washington. (1993). \textit{Power systems test case archive: 14 bus test case}. University of Washington Electrical Engineering. https://labs.ece.uw.edu/pstca/
+
+\bibitem{wood2013}
+Wood, A.~J., Wollenberg, B.~F., \& Shebl{\'e}, G.~B. (2013). \textit{Power generation, operation, and control} (3rd ed.). John Wiley \& Sons.
+
+\bibitem{zimmerman2011}
+Zimmerman, R.~D., Murillo-S{\'a}nchez, C.~E., \& Thomas, R.~J. (2011). MATPOWER: Steady-state operations, planning, and analysis tools for power systems research and education. \textit{IEEE Transactions on Power Systems}, \textit{26}(1), 12--19. https://doi.org/10.1109/TPWRS.2010.2051168
 
 \end{thebibliography}
 
